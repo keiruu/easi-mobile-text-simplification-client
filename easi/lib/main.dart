@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'http-methods.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 
 void main() {
   runApp(MyApp());
@@ -32,6 +33,7 @@ class _MyHomePageState extends State<MyHomePage> {
   var simplifiedResult;
   String simplified = "";
   String prompt = "";
+  bool loading = false;
 
   void setPrompt() {
     setState(() {
@@ -41,9 +43,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void setSimplifiedText(prompt) async{
     try {
+      setState(() {
+        loading = true;
+      });
+
       simplifiedResult = await postSimplifyText(prompt);
       setState(() {
         simplified = simplifiedResult;
+        loading = false;
       });
     } catch (e) {
       print("Error simplifying text");
@@ -57,7 +64,15 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
+      body: loading ? const Center(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(150, 0, 150, 0),
+            child: LoadingIndicator(
+              indicatorType: Indicator.ballPulse,
+            )
+          )
+        )
+        : Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -72,16 +87,35 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.all(15), 
-              child: TextField(
-                minLines: 1,
-                maxLines: 100,
-                enabled: false,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: '$simplified',
-                ),
+            // Padding(
+            //   padding: EdgeInsets.all(15), 
+            //   child: TextField(
+            //     minLines: 1,
+            //     maxLines: 100,
+            //     enabled: false,
+            //     decoration: InputDecoration(
+            //       border: OutlineInputBorder(),
+            //       hintText: '$simplified',
+            //     ),
+            //   ),
+            // ),
+            FractionallySizedBox(
+              widthFactor: 1,
+              child:  Container(
+                height: 200,
+                margin: const EdgeInsets.all(15.0),
+                padding: const EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Color.fromARGB(255, 111, 111, 111),
+                    width: 0.8,
+                  ),
+                  borderRadius: BorderRadius.circular(3)
+                ), 
+                child: Text(
+                  '$simplified',
+                  style: TextStyle(fontSize: 16.0),
+                )
               ),
             ),
             Padding(
