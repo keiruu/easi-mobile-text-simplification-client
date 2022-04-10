@@ -28,7 +28,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  TextEditingController inputController = TextEditingController();  
+  TextEditingController inputController = TextEditingController(); 
+  var simplifiedResult;
   String simplified = "";
   String prompt = "";
 
@@ -39,12 +40,15 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void setSimplifiedText(prompt) async{
-    await postSimplifyText(prompt)
-      .then(() {
-        setState(() async {
-          simplified = await postSimplifyText(prompt);
-        });
+    try {
+      simplifiedResult = await postSimplifyText(prompt);
+      setState(() {
+        simplified = simplifiedResult;
       });
+    } catch (e) {
+      print("Error simplifying text");
+      print(e);
+    }
   }
 
   @override
@@ -69,11 +73,26 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             Padding(
+              padding: EdgeInsets.all(15), 
+              child: TextField(
+                minLines: 1,
+                maxLines: 100,
+                enabled: false,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: '$simplified',
+                ),
+              ),
+            ),
+            Padding(
               padding: EdgeInsets.all(15),
               child: TextButton(
                 style: ButtonStyle(
                   foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                  backgroundColor: MaterialStateProperty.all<Color>(Colors.blue)
+                  backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+                  padding: MaterialStateProperty.all(
+                      const EdgeInsets.fromLTRB(138, 13, 138, 13)
+                  ),
                 ),
                 onPressed: () {
                   setPrompt();
@@ -82,18 +101,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Text('Simplify'),
               )
             ),
-            Padding(
-              padding: EdgeInsets.all(15),
-              child: RichText(
-                text: TextSpan(
-                  text: '$simplified',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 15
-                  )
-                ),
-              )
-              )
           ],
         ),
       ),// This trailing comma makes auto-formatting nicer for build methods.
