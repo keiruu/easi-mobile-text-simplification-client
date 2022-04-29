@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 // if gagamit ka physical device to debug, run this command sa cmd
-// adb reverse tcp:3000 tcp:3000
+// adb reverse tcp:5000 tcp:5000
 
 // Make a request
 
@@ -12,7 +12,7 @@ postSimplifyText(prompt) async {
   var response;
   
   try {
-    var url = Uri.parse('http://localhost:3000/translate');
+    var url = Uri.parse('http://127.0.0.1:5000/translate');
     response = await http.post(
       url,
       headers: <String, String>{
@@ -29,10 +29,12 @@ postSimplifyText(prompt) async {
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
     
-    var decodedText = json.decode(response.body);
+    return response.body;
+    // var decodedText = json.decode(response.body);
     
-    print(decodedText['text']);
-    return decodedText['text'];
+    // print("Decoded");
+    // print(decodedText['text']);
+    // return decodedText['text'];
   }
 
 }
