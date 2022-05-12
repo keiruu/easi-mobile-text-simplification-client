@@ -38,12 +38,6 @@ class _MyHomePageState extends State<MyHomePage> {
         fit: BoxFit.cover,
       );
     } else {
-      // return Image.asset(
-      //   "assets/placeholder.jpg",
-      //   width: 250,
-      //   height: 250,
-      //   fit: BoxFit.cover,
-      // );
       return Text("Wala image");
     }
   }
@@ -61,24 +55,30 @@ class _MyHomePageState extends State<MyHomePage> {
       // ImageCropper().cropImage(sourcePath: sourcePath)
       var cropped = await ImageCropper().cropImage(
           sourcePath: image.path,
-          aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
+          aspectRatioPresets: [
+            CropAspectRatioPreset.square,
+            CropAspectRatioPreset.ratio3x2,
+            CropAspectRatioPreset.original,
+            CropAspectRatioPreset.ratio4x3,
+            CropAspectRatioPreset.ratio16x9
+          ],
           compressQuality: 100,
-          maxWidth: 700,
-          maxHeight: 700,
           compressFormat: ImageCompressFormat.jpg,
           uiSettings: [
             AndroidUiSettings(
-              toolbarColor: Colors.deepOrange,
-              toolbarTitle: "Cropper",
-              statusBarColor: Colors.deepOrange.shade900,
-              backgroundColor: Colors.white,
-            )
+                toolbarTitle: 'Cropper',
+                toolbarColor: Colors.deepPurpleAccent,
+                toolbarWidgetColor: Colors.white,
+                initAspectRatio: CropAspectRatioPreset.original,
+                lockAspectRatio: false)
           ]);
 
-      this.setState(() {
-        _selectedFile = cropped;
-        _inProcess = false;
-      });
+      if (cropped != null) {
+        this.setState(() {
+          _selectedFile = File(cropped.path);
+          _inProcess = false;
+        });
+      }
     } else {
       this.setState(() {
         _inProcess = false;
