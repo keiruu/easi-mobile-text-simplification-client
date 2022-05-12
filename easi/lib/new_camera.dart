@@ -108,6 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
         });
       }
 
+      // Temporary for now, dapat after sini is to send _selectedFile to firebase for extraction
       saveImage();
     } else {
       this.setState(() {
