@@ -1,3 +1,4 @@
+import 'package:easi/screens/camera_screen.dart';
 import 'package:flutter/material.dart';
 import 'http-methods.dart';
 import 'package:loading_indicator/loading_indicator.dart';
@@ -30,6 +31,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
   TextEditingController inputController = TextEditingController(); 
   var simplifiedResult;
   String simplified = "";
@@ -136,9 +138,42 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Text('Simplify'),
               )
             ),
+             Padding(
+              padding: EdgeInsets.all(2),
+              child: TextButton(
+                style: ButtonStyle(
+                  foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                  backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+                  padding: MaterialStateProperty.all(
+                      const EdgeInsets.fromLTRB(138, 13, 138, 13)
+                  ),
+                ),
+                onPressed: () {
+                // CODE TO PUSH TO A NEW SCREEN
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                      Camera(),
+                  ),
+                );
+                },
+                child: Text('Camera'),
+              )
+            ),
           ],
         ),
       ),// This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
+
+// CODE TO PUSH TO A NEW SCREEN
+// Navigator.of(context).push(
+//   MaterialPageRoute(
+//     builder: (context) =>
+//         PreviewScreen(
+//       imageFile: _imageFile!,
+//       fileList: allFileList,
+//     ),
+//   ),
+// );
