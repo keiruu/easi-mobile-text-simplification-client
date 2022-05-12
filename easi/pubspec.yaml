@@ -38,6 +38,15 @@ dependencies:
   loading_indicator: ^3.0.3
   camerawesome: ^0.3.0+1
   camera: ^0.9.4+21
+  path_provider: ^2.0.9
+  video_player: ^2.4.0
+  permission_handler: ^9.2.0
+  image_picker: ^0.8.5
+  image_gallery_saver: ^1.7.1
+  uri_to_file: ^0.2.0
+  gallery_saver: ^2.3.2
+  image_cropper: ^2.0.2
+  photo_manager: ^2.0.9
 
 dev_dependencies:
   flutter_test:
