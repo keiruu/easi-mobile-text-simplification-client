@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:gallery_saver/gallery_saver.dart';
 
 void main() => runApp(MyApp());
 
@@ -42,6 +44,32 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  saveImage() async {
+    int currentUnix = DateTime.now().millisecondsSinceEpoch;
+
+    final directory = await getApplicationDocumentsDirectory();
+
+    String fileFormat = _selectedFile.path.split('.').last;
+
+    print(fileFormat);
+
+    await _selectedFile.copy(
+      '${directory.path}/$currentUnix.$fileFormat',
+    );
+    print(directory.path);
+    print(currentUnix);
+
+    // Link to solution: https://stackoverflow.com/questions/68046612/flutter-image-gallery-saver-image-not-showing-after-saving
+    // Saves image to local storage after saving it to app directory storage
+    try {
+      bool? isImageSaved = await GallerySaver.saveImage(
+          '${directory.path}/$currentUnix.$fileFormat',
+          albumName: "easi");
+    } catch (exception) {
+      print("Error $exception");
+    }
+  }
+
   getImage(ImageSource source) async {
     this.setState(() {
       _inProcess = true;
@@ -79,6 +107,8 @@ class _MyHomePageState extends State<MyHomePage> {
           _inProcess = false;
         });
       }
+
+      saveImage();
     } else {
       this.setState(() {
         _inProcess = false;
