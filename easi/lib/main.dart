@@ -1,179 +1,166 @@
-import 'package:easi/screens/camera_screen.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'http-methods.dart';
-import 'package:loading_indicator/loading_indicator.dart';
-import 'camera.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:gallery_saver/gallery_saver.dart';
 
-void main() {
-  runApp(MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Easi',
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Easi'),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
-  final String title;
-
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  var _selectedFile;
+  bool _inProcess = false;
 
-  TextEditingController inputController = TextEditingController(); 
-  var simplifiedResult;
-  String simplified = "";
-  String prompt = "";
-  bool loading = false;
-
-  void setPrompt() {
-    setState(() {
-      prompt = inputController.text;
-    });
+  Widget getImageWidget() {
+    if (_selectedFile != null) {
+      return Image.file(
+        _selectedFile,
+        width: 250,
+        height: 250,
+        fit: BoxFit.cover,
+      );
+    } else {
+      return Text("Wala image");
+    }
   }
 
-  void setSimplifiedText(prompt) async{
-    try {
-      setState(() {
-        loading = true;
-      });
+  saveImage() async {
+    int currentUnix = DateTime.now().millisecondsSinceEpoch;
 
-      simplifiedResult = await postSimplifyText(prompt);
-      setState(() {
-        simplified = simplifiedResult;
-        loading = false;
+    final directory = await getApplicationDocumentsDirectory();
+
+    String fileFormat = _selectedFile.path.split('.').last;
+
+    print(fileFormat);
+
+    await _selectedFile.copy(
+      '${directory.path}/$currentUnix.$fileFormat',
+    );
+    print(directory.path);
+    print(currentUnix);
+
+    // Link to solution: https://stackoverflow.com/questions/68046612/flutter-image-gallery-saver-image-not-showing-after-saving
+    // Saves image to local storage after saving it to app directory storage
+    try {
+      bool? isImageSaved = await GallerySaver.saveImage(
+          '${directory.path}/$currentUnix.$fileFormat',
+          albumName: "easi");
+    } catch (exception) {
+      print("Error $exception");
+    }
+  }
+
+  getImage(ImageSource source) async {
+    this.setState(() {
+      _inProcess = true;
+    });
+
+    final ImagePicker _picker = ImagePicker();
+
+    final XFile? image = await _picker.pickImage(source: source);
+    // File image = await ImagePicker.pickImage(source: source);
+    if (image != null) {
+      // ImageCropper().cropImage(sourcePath: sourcePath)
+      var cropped = await ImageCropper().cropImage(
+          sourcePath: image.path,
+          aspectRatioPresets: [
+            CropAspectRatioPreset.square,
+            CropAspectRatioPreset.ratio3x2,
+            CropAspectRatioPreset.original,
+            CropAspectRatioPreset.ratio4x3,
+            CropAspectRatioPreset.ratio16x9
+          ],
+          compressQuality: 100,
+          compressFormat: ImageCompressFormat.jpg,
+          uiSettings: [
+            AndroidUiSettings(
+                toolbarTitle: 'Cropper',
+                toolbarColor: Colors.deepPurpleAccent,
+                toolbarWidgetColor: Colors.white,
+                initAspectRatio: CropAspectRatioPreset.original,
+                lockAspectRatio: false)
+          ]);
+
+      if (cropped != null) {
+        this.setState(() {
+          _selectedFile = File(cropped.path);
+          _inProcess = false;
+        });
+      }
+
+      // Temporary for now, dapat after sini is to send _selectedFile to firebase for extraction
+      saveImage();
+    } else {
+      this.setState(() {
+        _inProcess = false;
       });
-    } catch (e) {
-      print("Error simplifying text");
-      print(e);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: loading ? const Center(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(150, 0, 150, 0),
-            child: LoadingIndicator(
-              indicatorType: Indicator.ballPulse,
-            )
-          )
-        )
-        : Center(
-        child: Column(
+        body: Stack(
+      children: <Widget>[
+        Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Padding(
-              padding: EdgeInsets.all(15), 
-              child: TextField(
-                controller: inputController,
-                maxLines: 10,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Enter text to simplify'
-                ),
-              ),
-            ),
-            // Padding(
-            //   padding: EdgeInsets.all(15), 
-            //   child: TextField(
-            //     minLines: 1,
-            //     maxLines: 100,
-            //     enabled: false,
-            //     decoration: InputDecoration(
-            //       border: OutlineInputBorder(),
-            //       hintText: '$simplified',
-            //     ),
-            //   ),
-            // ),
-            FractionallySizedBox(
-              widthFactor: 1,
-              child:  Container(
-                height: 200,
-                margin: const EdgeInsets.all(15.0),
-                padding: const EdgeInsets.all(10.0),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Color.fromARGB(255, 111, 111, 111),
-                    width: 0.8,
-                  ),
-                  borderRadius: BorderRadius.circular(3)
-                ), 
-                child: Text(
-                  '$simplified',
-                  style: TextStyle(fontSize: 16.0),
-                )
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(15),
-              child: TextButton(
-                style: ButtonStyle(
-                  foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                  backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-                  padding: MaterialStateProperty.all(
-                      const EdgeInsets.fromLTRB(138, 13, 138, 13)
-                  ),
-                ),
-                onPressed: () {
-                  setPrompt();
-                  setSimplifiedText(prompt);
-                },
-                child: Text('Simplify'),
-              )
-            ),
-             Padding(
-              padding: EdgeInsets.all(2),
-              child: TextButton(
-                style: ButtonStyle(
-                  foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                  backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-                  padding: MaterialStateProperty.all(
-                      const EdgeInsets.fromLTRB(138, 13, 138, 13)
-                  ),
-                ),
-                onPressed: () {
-                // CODE TO PUSH TO A NEW SCREEN
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) =>
-                      Camera(),
-                  ),
-                );
-                },
-                child: Text('Camera'),
-              )
-            ),
+            getImageWidget(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                MaterialButton(
+                    color: Colors.green,
+                    child: Text(
+                      "Camera",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {
+                      getImage(ImageSource.camera);
+                    }),
+                MaterialButton(
+                    color: Colors.deepOrange,
+                    child: Text(
+                      "Device",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {
+                      getImage(ImageSource.gallery);
+                    })
+              ],
+            )
           ],
         ),
-      ),// This trailing comma makes auto-formatting nicer for build methods.
-    );
+        (_inProcess)
+            ? Container(
+                color: Colors.white,
+                height: MediaQuery.of(context).size.height * 0.95,
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            : Center()
+      ],
+    ));
   }
 }
-
-// CODE TO PUSH TO A NEW SCREEN
-// Navigator.of(context).push(
-//   MaterialPageRoute(
-//     builder: (context) =>
-//         PreviewScreen(
-//       imageFile: _imageFile!,
-//       fileList: allFileList,
-//     ),
-//   ),
-// );
