@@ -4,6 +4,8 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:gallery_saver/gallery_saver.dart';
+// import 'text_recognition.dart';
+import 'package:google_ml_kit/google_ml_kit.dart';
 
 void main() => runApp(MyApp());
 
@@ -30,6 +32,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   var _selectedFile;
   bool _inProcess = false;
+  bool _scanningText = false;
+  var extractedText;
 
   Widget getImageWidget() {
     if (_selectedFile != null) {
@@ -70,6 +74,26 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  getRecognizedText(final inputImage) async {
+    final textDetector = GoogleMlKit.vision.textRecognizer();
+
+    RecognizedText recognizedText = await textDetector.processImage(inputImage);
+    await textDetector.close();
+
+    String scannedText = "";
+
+    for (TextBlock block in recognizedText.blocks) {
+      for (TextLine line in block.lines) {
+        scannedText = scannedText + line.text + "\n";
+      }
+    }
+
+    setState(() {
+      extractedText = scannedText;
+      _scanningText = false;
+    });
+  }
+
   getImage(ImageSource source) async {
     this.setState(() {
       _inProcess = true;
@@ -105,10 +129,15 @@ class _MyHomePageState extends State<MyHomePage> {
         this.setState(() {
           _selectedFile = File(cropped.path);
           _inProcess = false;
+          _scanningText = true;
         });
       }
 
-      // Temporary for now, dapat after sini is to send _selectedFile to firebase for extraction
+      // Send text for extraction
+      final inputImage = InputImage.fromFile(_selectedFile);
+      getRecognizedText(inputImage);
+
+      // Save cropped image
       saveImage();
     } else {
       this.setState(() {
@@ -146,12 +175,13 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     onPressed: () {
                       getImage(ImageSource.gallery);
-                    })
+                    }),
               ],
-            )
+            ),
+            Text('$extractedText')
           ],
         ),
-        (_inProcess)
+        (_inProcess || _scanningText)
             ? Container(
                 color: Colors.white,
                 height: MediaQuery.of(context).size.height * 0.95,
