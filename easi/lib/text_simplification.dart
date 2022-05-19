@@ -1,6 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'http-methods.dart';
+import 'http_methods.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 
 import 'main.dart';
