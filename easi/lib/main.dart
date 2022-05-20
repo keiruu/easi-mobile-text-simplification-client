@@ -4,8 +4,9 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:gallery_saver/gallery_saver.dart';
-// import 'text_recognition.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
+
+import 'home.dart';
 
 void main() => runApp(MyApp());
 
@@ -149,11 +150,23 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Stack(
+      extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: Image.asset(
+            'assets/logo.png',
+            height: 50,
+            width: 50,
+          ),
+          centerTitle: true,
+        ),
+      body: Stack(
       children: <Widget>[
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Home(),
             getImageWidget(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
