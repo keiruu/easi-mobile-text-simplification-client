@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:flutter/services.dart';
 
 import 'home.dart';
@@ -39,13 +38,11 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
+  // Bottom navigation screen options
   List<Widget> _widgetOptions = <Widget>[Home(), Profile()];
 
   @override
   Widget build(BuildContext context) {
-    PersistentTabController _controller;
-    _controller = PersistentTabController(initialIndex: 0);
-
     return Scaffold(
         resizeToAvoidBottomInset: false,
         extendBodyBehindAppBar: true,
