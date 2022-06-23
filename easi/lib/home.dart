@@ -70,6 +70,7 @@ class _HomeState extends State<Home> {
   getRecognizedText(final inputImage) async {
     final textDetector = GoogleMlKit.vision.textRecognizer();
     List<TextElement> _elements = [];
+    List<TextLine> _lines = [];
 
     RecognizedText recognizedText = await textDetector.processImage(inputImage);
     await textDetector.close();
@@ -77,10 +78,9 @@ class _HomeState extends State<Home> {
     String scannedText = "";
 
     for (TextBlock block in recognizedText.blocks) {
-      print(block);
-      print(block);
       for (TextLine line in block.lines) {
         scannedText = scannedText + line.text + "\n";
+        _lines.add(line);
         for (TextElement element in line.elements) {
             _elements.add(element);
         }
@@ -94,11 +94,11 @@ class _HomeState extends State<Home> {
     print(_extractedText);
 
     // Save cropped image
-    saveImage();
+    // saveImage();
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ImageScreen(_selectedFile, _extractedText, recognizedText, _elements),
+        builder: (context) => ImageScreen(_selectedFile, _extractedText, recognizedText, _elements, _lines),
       ),
     );
     // Send scanned text to backend. Refer to text_simplification.dart for the process.

@@ -12,8 +12,10 @@ class ImageScreen extends StatefulWidget {
   final extractedText;
   final recognizedText;
   final elements;
+  final lines;
 
-  const ImageScreen(this.selectedFile, this.extractedText, this.recognizedText, this.elements,
+  const ImageScreen(this.selectedFile, this.extractedText, this.recognizedText,
+      this.elements, this.lines,
       {Key? key})
       : super(key: key);
 
@@ -114,8 +116,8 @@ class _ImageScreenState extends State<ImageScreen> {
                   width: double.maxFinite,
                   color: Colors.black,
                   child: CustomPaint(
-                    foregroundPainter:
-                        TextDetectorPainter(_imageSize, widget.elements),
+                    foregroundPainter: TextDetectorPainter(
+                        _imageSize, widget.elements, widget.lines),
                     child: AspectRatio(
                       aspectRatio: _imageSize.aspectRatio,
                       child: Image.file(
@@ -129,7 +131,7 @@ class _ImageScreenState extends State<ImageScreen> {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Card(
-                  elevation: 8,
+                  elevation: 13,
                   color: Colors.white,
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -138,16 +140,6 @@ class _ImageScreenState extends State<ImageScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Row(),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: Text(
-                            "Identified emails",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
                         Container(
                           height: 60,
                           child: SingleChildScrollView(
@@ -173,10 +165,11 @@ class _ImageScreenState extends State<ImageScreen> {
 }
 
 class TextDetectorPainter extends CustomPainter {
-  TextDetectorPainter(this.absoluteImageSize, this.elements);
+  TextDetectorPainter(this.absoluteImageSize, this.elements, this.lines);
 
   final Size absoluteImageSize;
   final List<TextElement> elements;
+  final List<TextLine> lines;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -193,13 +186,42 @@ class TextDetectorPainter extends CustomPainter {
     }
 
     final Paint paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..color = Colors.red
+      ..style = PaintingStyle.fill
+      ..color = Colors.white
       ..strokeWidth = 2.0;
 
-    for (TextElement element in elements) {
-      canvas.drawRect(scaleRect(element), paint);
+    // Color in each element
+    // for (TextElement element in elements) {
+    //   canvas.drawRect(scaleRect(element), paint);
+    // }
+
+    // Color in whole line
+    for (TextLine line in lines) {
+      canvas.drawRect(scaleRect(line), paint);
     }
+
+    // Draw text 
+    for (TextLine line in lines) {
+      // replace line.text with the simplified text
+      drawName(canvas, line.text, scaleRect(line).height,
+          scaleRect(line).left, scaleRect(line).top);
+    }
+
+  }
+
+  void drawName(Canvas context, String text, double size, double x, double y) {
+    TextSpan span = TextSpan(
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: size - 3,
+        ),
+        text: text);
+    TextPainter tp = TextPainter(
+        text: span,
+        textAlign: TextAlign.left,
+        textDirection: TextDirection.ltr);
+    tp.layout();
+    tp.paint(context, Offset(x, y));
   }
 
   @override
