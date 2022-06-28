@@ -1,3 +1,4 @@
+import 'package:easi/http_methods.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -6,6 +7,8 @@ import 'dart:ui';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:loading_indicator/loading_indicator.dart';
+import 'http_methods.dart';
 
 class ImageScreen extends StatefulWidget {
   final selectedFile;
@@ -13,9 +16,10 @@ class ImageScreen extends StatefulWidget {
   final recognizedText;
   final elements;
   final lines;
+  final results;
 
   const ImageScreen(this.selectedFile, this.extractedText, this.recognizedText,
-      this.elements, this.lines,
+      this.elements, this.lines, this.results,
       {Key? key})
       : super(key: key);
 
@@ -27,6 +31,9 @@ class _ImageScreenState extends State<ImageScreen> {
   var _imageSize;
   List<TextElement> _elements = [];
   String recognizedText = "Loading ...";
+  bool loading = false;
+  var simplifiedResult;
+  String simplify = "";
 
   Future<void> _getImageSize(File imageFile) async {
     final Completer<Size> completer = Completer<Size>();
@@ -54,35 +61,22 @@ class _ImageScreenState extends State<ImageScreen> {
       await _getImageSize(imageFile);
     }
 
-    // final FirebaseVisionImage visionImage =
-    //     FirebaseVisionImage.fromFile(imageFile);
-
-    // final TextRecognizer textRecognizer =
-    //     FirebaseVision.instance.textRecognizer();
-
-    // final VisionText visionText =
-    //     await textRecognizer.processImage(visionImage);
-
-    // String pattern =
-    //     r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$";
-    // RegExp regEx = RegExp(pattern);
-
-    // String mailAddress = "";
-    // for (TextBlock block in recognizedText.blocks) {
-    //   for (TextLine line in block.lines) {
-    //     if (regEx.hasMatch(line.text)) {
-    //       mailAddress += line.text + '\n';
-    //       for (TextElement element in line.elements) {
-    //         _elements.add(element);
-    //       }
-    //     }
-    //   }
-    // }
-
     if (this.mounted) {
       setState(() {
         recognizedText = widget.extractedText;
       });
+    }
+  }
+
+  void getSimplifiedText(prompt) async {
+    try {
+      simplifiedResult = await postSimplifyText(prompt);
+      print("simplfied result");
+      print(simplifiedResult);
+      // return simplifiedResult;
+    } catch (e) {
+      print("Error simplifying text");
+      print(e);
     }
   }
 
@@ -108,73 +102,89 @@ class _ImageScreenState extends State<ImageScreen> {
   // widget._selectedFile
   @override
   Widget build(BuildContext context) {
-    return _imageSize != null
-        ? Stack(
-            children: <Widget>[
-              Center(
-                child: Container(
-                  width: double.maxFinite,
-                  color: Colors.black,
-                  child: CustomPaint(
-                    foregroundPainter: TextDetectorPainter(
-                        _imageSize, widget.elements, widget.lines),
-                    child: AspectRatio(
-                      aspectRatio: _imageSize.aspectRatio,
-                      child: Image.file(
-                        // File(path),
-                        widget.selectedFile,
+    return !loading
+        ? _imageSize != null
+            ? Stack(
+                children: <Widget>[
+                  Center(
+                    child: Container(
+                      width: double.maxFinite,
+                      color: Colors.black,
+                      child: CustomPaint(
+                        foregroundPainter: TextDetectorPainter(
+                            _imageSize,
+                            widget.elements,
+                            widget.lines,
+                            widget.extractedText,
+                            widget.results),
+                        child: AspectRatio(
+                          aspectRatio: _imageSize.aspectRatio,
+                          child: Image.file(
+                            // File(path),
+                            widget.selectedFile,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Card(
-                  elevation: 13,
-                  color: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Row(),
-                        Container(
-                          height: 60,
-                          child: SingleChildScrollView(
-                            child: Text(
-                              recognizedText,
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Card(
+                      elevation: 13,
+                      color: Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Row(),
+                            Container(
+                              height: 60,
+                              child: SingleChildScrollView(
+                                child: Text(
+                                  widget.results,
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ],
-          )
-        : Container(
-            color: Colors.black,
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
+                ],
+              )
+            : Center(
+                child: Padding(
+                    padding: EdgeInsets.fromLTRB(150, 0, 150, 0),
+                    child: LoadingIndicator(
+                      indicatorType: Indicator.ballPulse,
+                    )))
+        : Center(
+            child: Padding(
+                padding: EdgeInsets.fromLTRB(150, 0, 150, 0),
+                child: LoadingIndicator(
+                  indicatorType: Indicator.ballPulse,
+                )));
   }
 }
 
 class TextDetectorPainter extends CustomPainter {
-  TextDetectorPainter(this.absoluteImageSize, this.elements, this.lines);
+  TextDetectorPainter(this.absoluteImageSize, this.elements, this.lines,
+      this.extractedText, this.results);
+  final _ImageScreenState imgstate = new _ImageScreenState();
 
   final Size absoluteImageSize;
   final List<TextElement> elements;
   final List<TextLine> lines;
+  final extractedText;
+  final results;
 
   @override
-  void paint(Canvas canvas, Size size) {
+  void paint(Canvas canvas, Size size) async {
     final double scaleX = size.width / absoluteImageSize.width;
     final double scaleY = size.height / absoluteImageSize.height;
+    final List<TextLine> newLines;
 
     Rect scaleRect(container) {
       return Rect.fromLTRB(
@@ -200,13 +210,43 @@ class TextDetectorPainter extends CustomPainter {
       canvas.drawRect(scaleRect(line), paint);
     }
 
-    // Draw text 
-    for (TextLine line in lines) {
-      // replace line.text with the simplified text
-      drawName(canvas, line.text, scaleRect(line).height,
-          scaleRect(line).left, scaleRect(line).top);
+    // Get rid of next line
+    final List noNextLine = results.split('\n');
+    // Loop through the list and store into string.
+    String wordsToBeSplit = "";
+    for (var e in noNextLine) {
+      wordsToBeSplit = wordsToBeSplit + e + " ";
     }
 
+    // Now split that string and get the words.
+    final List words = wordsToBeSplit.split(' ');
+
+    int num = 0;
+    int endLength = 0;
+
+    for (TextLine line in lines) {
+      // list of words in a line, lineSplit.length = pila ka words ara sa isa ka line.
+      final List lineSplit = line.text.split(' ');
+      String result = "";
+
+      for (var x = 0; x < lineSplit.length; x++) {
+        // Stitches together the line based on the number of words sa original text
+        result = result + words[num] + " ";
+        num++;
+        // Set end number
+        endLength = num - 1;
+      }
+
+      // Display each line
+      drawName(canvas, result, scaleRect(line).height + 2, scaleRect(line).left,
+          scaleRect(line).top);
+
+      num = endLength + 1;
+
+      // I just coded this a few seconds ago and 
+      // idk how it works anymore but 
+      // what's important is that it does work.
+    }
   }
 
   void drawName(Canvas context, String text, double size, double x, double y) {

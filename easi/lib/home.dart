@@ -5,6 +5,7 @@ import 'words_in_picture.dart';
 import 'text_simplification.dart';
 import 'image_output_screen.dart';
 import 'dart:io';
+import 'http_methods.dart';
 
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -71,6 +72,7 @@ class _HomeState extends State<Home> {
     final textDetector = GoogleMlKit.vision.textRecognizer();
     List<TextElement> _elements = [];
     List<TextLine> _lines = [];
+    final results;
 
     RecognizedText recognizedText = await textDetector.processImage(inputImage);
     await textDetector.close();
@@ -82,11 +84,12 @@ class _HomeState extends State<Home> {
         scannedText = scannedText + line.text + "\n";
         _lines.add(line);
         for (TextElement element in line.elements) {
-            _elements.add(element);
+          _elements.add(element);
         }
       }
     }
 
+    results = await postSimplifyText(scannedText);
     setState(() {
       _extractedText = scannedText;
       _scanningText = false;
@@ -98,7 +101,8 @@ class _HomeState extends State<Home> {
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ImageScreen(_selectedFile, _extractedText, recognizedText, _elements, _lines),
+        builder: (context) => ImageScreen(_selectedFile, _extractedText,
+            recognizedText, _elements, _lines, results),
       ),
     );
     // Send scanned text to backend. Refer to text_simplification.dart for the process.
