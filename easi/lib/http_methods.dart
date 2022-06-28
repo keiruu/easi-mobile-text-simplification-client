@@ -12,7 +12,7 @@ postSimplifyText(prompt) async {
   var response;
   
   try {
-    var url = Uri.parse('http://127.0.0.1:5000/translate');
+    var url = Uri.parse('https://easi-backend.herokuapp.com/translate');
     response = await http.post(
       url,
       headers: <String, String>{
