@@ -246,6 +246,7 @@ class TextDetectorPainter extends CustomPainter {
       // I just coded this a few seconds ago and 
       // idk how it works anymore but 
       // what's important is that it does work.
+      // sorry nalang future me if ever e edit mo ni.
     }
   }
 
