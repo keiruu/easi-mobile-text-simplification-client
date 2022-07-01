@@ -81,7 +81,7 @@ class _HomeState extends State<Home> {
 
     for (TextBlock block in recognizedText.blocks) {
       for (TextLine line in block.lines) {
-        scannedText = scannedText + line.text + "\n";
+        scannedText = scannedText + line.text + " ";
         _lines.add(line);
         for (TextElement element in line.elements) {
           _elements.add(element);
@@ -151,8 +151,10 @@ class _HomeState extends State<Home> {
       }
 
       // Send text for extraction
-      final inputImage = InputImage.fromFile(_selectedFile);
-      getRecognizedText(inputImage);
+      if (_selectedFile != null) {
+        final inputImage = InputImage.fromFile(_selectedFile);
+        getRecognizedText(inputImage);
+      }
     } else {
       this.setState(() {
         _inProcess = false;

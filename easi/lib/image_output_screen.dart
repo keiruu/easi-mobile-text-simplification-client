@@ -130,7 +130,7 @@ class _ImageScreenState extends State<ImageScreen> {
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: Card(
-                      elevation: 13,
+                      elevation: 20,
                       color: Colors.white,
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
@@ -201,9 +201,9 @@ class TextDetectorPainter extends CustomPainter {
       ..strokeWidth = 2.0;
 
     // Color in each element
-    // for (TextElement element in elements) {
-    //   canvas.drawRect(scaleRect(element), paint);
-    // }
+    for (TextElement element in elements) {
+      canvas.drawRect(scaleRect(element), paint);
+    }
 
     // Color in whole line
     for (TextLine line in lines) {
