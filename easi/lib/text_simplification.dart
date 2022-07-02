@@ -91,7 +91,7 @@ class _TextSimplificationState extends State<TextSimplification> {
                         child: TextField(
                           onChanged: (value) => {
                             setState(() => {counter = value.length}),
-                            if (value.length > 60)
+                            if (value.length > 300)
                               {
                                 setState(() => {over = true})
                               }
@@ -110,7 +110,7 @@ class _TextSimplificationState extends State<TextSimplification> {
                       ),
                       Padding(
                           padding: EdgeInsets.all(25),
-                          child: Text("$counter/60",
+                          child: Text("$counter/300",
                               style: TextStyle(
                                   color: over ? Colors.red : Colors.black))),
                     ],

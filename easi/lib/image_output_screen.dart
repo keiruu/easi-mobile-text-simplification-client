@@ -130,7 +130,7 @@ class _ImageScreenState extends State<ImageScreen> {
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: Card(
-                      elevation: 20,
+                      elevation: 10,
                       color: Colors.white,
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
@@ -140,7 +140,7 @@ class _ImageScreenState extends State<ImageScreen> {
                           children: <Widget>[
                             Row(),
                             Container(
-                              height: 60,
+                              height: 100,
                               child: SingleChildScrollView(
                                 child: Text(
                                   widget.results,
@@ -220,7 +220,8 @@ class TextDetectorPainter extends CustomPainter {
 
     // Now split that string and get the words.
     final List words = wordsToBeSplit.split(' ');
-
+    int len2 = words.length;
+    print('Words $len2');
     int num = 0;
     int endLength = 0;
 
@@ -228,13 +229,19 @@ class TextDetectorPainter extends CustomPainter {
       // list of words in a line, lineSplit.length = pila ka words ara sa isa ka line.
       final List lineSplit = line.text.split(' ');
       String result = "";
-
-      for (var x = 0; x < lineSplit.length; x++) {
+      int len = lineSplit.length;
+      print("Line split length $len");
+      for (var x = 0; x <= lineSplit.length; x++) {
         // Stitches together the line based on the number of words sa original text
-        result = result + words[num] + " ";
-        num++;
-        // Set end number
-        endLength = num - 1;
+        // minus 2 kay for some reason sobra ang length by 2 ang results
+        if (num <= words.length && endLength <= words.length - 2) {
+          result = result + words[num] + " ";
+          num++;
+          // Set end number
+          endLength = num - 1;
+          print("End length $endLength");
+          print(result);
+        }
       }
 
       // Display each line
@@ -242,9 +249,10 @@ class TextDetectorPainter extends CustomPainter {
           scaleRect(line).top);
 
       num = endLength + 1;
+      print("Num $num");
 
-      // I just coded this a few seconds ago and 
-      // idk how it works anymore but 
+      // I just coded this a few seconds ago and
+      // idk how it works anymore but
       // what's important is that it does work.
       // sorry nalang future me if ever e edit mo ni.
     }
