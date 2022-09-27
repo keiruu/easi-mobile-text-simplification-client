@@ -51,8 +51,8 @@ class _TextSimplificationState extends State<TextSimplification> {
         elevation: 0,
         title: Image.asset(
           'assets/logo.png',
-          height: 50,
-          width: 50,
+          height: 35,
+          width: 35,
         ),
         centerTitle: true,
       ),
