@@ -49,8 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       extendBodyBehindAppBar: true,
-      appBar: globals.inProcess ? null
-      : AppBar(
+      appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Image.asset(
@@ -60,24 +59,15 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         centerTitle: true,
       ),
-      body: globals.inProcess ? 
-        Center(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(150, 0, 150, 0),
-            child: LoadingIndicator(
-              indicatorType: Indicator.ballPulse,
-            )
+      body: Stack(
+        children: <Widget>[
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[_widgetOptions.elementAt(_selectedIndex)],
           )
-        )
-      : Stack(children: <Widget>[
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[_widgetOptions.elementAt(_selectedIndex)],
-        )
-      ])
+        ])
       ,
-      bottomNavigationBar: globals.inProcess ? null
-      : BottomNavigationBar(
+      bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         selectedIconTheme: IconThemeData(color: Colors.white, size: 25),
         selectedItemColor: Colors.white,

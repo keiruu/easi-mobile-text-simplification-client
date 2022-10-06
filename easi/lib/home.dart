@@ -8,6 +8,7 @@ import 'text_simplification.dart';
 import 'image_output_screen.dart';
 import 'dart:io';
 import 'http_methods.dart';
+import 'history.dart';
 
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:flutter/material.dart';
@@ -114,7 +115,7 @@ class _HomeState extends State<Home> {
       _extractedText = scannedText;
       _scanningText = false;
     });
-    print(_extractedText);
+    // print(_extractedText);
 
     // Save cropped image
     // saveImage();
@@ -190,199 +191,232 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(32, 100, 32, 0),
-      child: Column(
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Row(
-              children: [
-                Text(
-                  'Hi ',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 24,
-                      color: Color(0xFF232253)),
+    // For calculating total height of screen
+    final mediaQuery = MediaQuery.of(context);
+
+    return Stack(
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.fromLTRB(32, 100, 32, 0),
+          child: Column(
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Row(
+                  children: [
+                    Text(
+                      'Hi ',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                          color: Color(0xFF232253)),
+                    ),
+                    Text('$userName 👋',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 24,
+                            color: Color(0xFF5274AE)))
+                  ],
                 ),
-                Text('$userName 👋',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24,
-                        color: Color(0xFF5274AE)))
-              ],
-            ),
-          ),
-          Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'We make sentences easier to understand.',
-                style: TextStyle(
-                    fontSize: 13,
-                    color: Color(0xFF6E7683),
-                    fontStyle: FontStyle.italic),
-              )),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 20),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text("Choose how you want to enter words:",
-                  style: TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF232253),
-                      fontWeight: FontWeight.w600)),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(bottom: 30),
-            child: Row(
-              children: [
-                InkWell(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => TextSimplification(),
-                        ),
-                      );
-                    },
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 180.0,
-                          width: 140.0,
-                          margin: EdgeInsets.only(bottom: 10),
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/words.png'),
-                              fit: BoxFit.fill,
+              ),
+              // Align(
+              //     alignment: Alignment.centerLeft,
+              //     child: Text(
+              //       'We make sentences easier to understand.',
+              //       style: TextStyle(
+              //           fontSize: 13,
+              //           color: Color(0xFF6E7683),
+              //           fontStyle: FontStyle.italic),
+              //     )),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text("Choose how you want to enter words:",
+                      style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF232253),
+                          fontWeight: FontWeight.w600)),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(bottom: 30),
+                child: Row(
+                  children: [
+                    InkWell(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => TextSimplification(),
                             ),
-                          ),
-                        ),
-                        Text(
-                          "Words by Typing",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFFC2A534),
-                          ),
-                        ),
-                      ],
-                    )),
-                Spacer(),
-                InkWell(
-                    onTap: () {
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return Dialog(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(14.0))),
-                              child: Container(
-                                padding: EdgeInsets.fromLTRB(30, 40, 30, 40),
-                                height: 200,
-                                child: Column(
-                                  mainAxisAlignment: _selectedFile != null
-                                      ? MainAxisAlignment.spaceEvenly
-                                      : MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    // if(_selectedFile != null)
-                                    //   getImageWidget()
-                                    // ,
-                                    // if(_selectedFile != null)
-                                    //   Text (_extractedText,
-                                    //   style: TextStyle(
-                                    //           color: Color.fromARGB(255, 0, 0, 0),)
-                                    //   )
-                                    // ,
-                                    TextButton(
-                                      style: TextButton.styleFrom(
-                                          backgroundColor: Color(0xFFFFF6D1),
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 15, horizontal: 5),
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(9.0))),
-                                          minimumSize: Size.fromHeight(40)),
-                                      onPressed: () {
-                                        getImage(ImageSource.camera);
-                                      },
-                                      child: Text('Camera',
-                                          style: TextStyle(
-                                              color: Color(0xFFF3D55E),
-                                              fontWeight: FontWeight.bold)),
-                                    ),
-                                    TextButton(
-                                      style: TextButton.styleFrom(
-                                          backgroundColor: Color(0xFFF8E2EC),
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 15, horizontal: 5),
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(9.0))),
-                                          minimumSize: Size.fromHeight(40)),
-                                      onPressed: () {
-                                        getImage(ImageSource.gallery);
-                                      },
-                                      child: Text('Gallery',
-                                          style: TextStyle(
-                                              color: Color(0xFFFE95C6),
-                                              fontWeight: FontWeight.bold)),
-                                    )
-                                  ],
+                          );
+                        },
+                        child: Column(
+                          children: [
+                            Container(
+                              height: 180.0,
+                              width: 140.0,
+                              margin: EdgeInsets.only(bottom: 10),
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: AssetImage('assets/words.png'),
+                                  fit: BoxFit.fill,
                                 ),
                               ),
-                            );
-                          });
-                    },
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 180.0,
-                          width: 140.0,
-                          margin: EdgeInsets.only(bottom: 10),
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/pics.png'),
-                              fit: BoxFit.fill,
                             ),
-                          ),
-                        ),
-                        Text(
-                          "Words by Picture",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF6FAEF2)),
-                        ),
-                      ],
-                    ))
-              ],
-            ),
+                            Text(
+                              "Words by Typing",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFFC2A534),
+                              ),
+                            ),
+                          ],
+                        )),
+                    Spacer(),
+                    InkWell(
+                        onTap: () {
+                          BuildContext dialogContext = context;
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return Dialog(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(14.0))),
+                                  child: Container(
+                                    padding:
+                                        EdgeInsets.fromLTRB(30, 40, 30, 40),
+                                    height: 200,
+                                    child: Column(
+                                      mainAxisAlignment: _selectedFile != null
+                                          ? MainAxisAlignment.spaceEvenly
+                                          : MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        // if(_selectedFile != null)
+                                        //   getImageWidget()
+                                        // ,
+                                        // if(_selectedFile != null)
+                                        //   Text (_extractedText,
+                                        //   style: TextStyle(
+                                        //           color: Color.fromARGB(255, 0, 0, 0),)
+                                        //   )
+                                        // ,
+                                        TextButton(
+                                          style: TextButton.styleFrom(
+                                              backgroundColor:
+                                                  Color(0xFFFFF6D1),
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 15, horizontal: 5),
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(
+                                                              9.0))),
+                                              minimumSize: Size.fromHeight(40)),
+                                          onPressed: () {
+                                            Navigator.pop(dialogContext);
+                                            getImage(ImageSource.camera);
+                                          },
+                                          child: Text('Camera',
+                                              style: TextStyle(
+                                                  color: Color(0xFFF3D55E),
+                                                  fontWeight: FontWeight.bold)),
+                                        ),
+                                        TextButton(
+                                          style: TextButton.styleFrom(
+                                              backgroundColor:
+                                                  Color(0xFFF8E2EC),
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 15, horizontal: 5),
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(
+                                                              9.0))),
+                                              minimumSize: Size.fromHeight(40)),
+                                          onPressed: () {
+                                            Navigator.pop(dialogContext);
+                                            getImage(ImageSource.gallery);
+                                          },
+                                          child: Text('Gallery',
+                                              style: TextStyle(
+                                                  color: Color(0xFFFE95C6),
+                                                  fontWeight: FontWeight.bold)),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              });
+                        },
+                        child: Column(
+                          children: [
+                            Container(
+                              height: 180.0,
+                              width: 140.0,
+                              margin: EdgeInsets.only(bottom: 10),
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: AssetImage('assets/pics.png'),
+                                  fit: BoxFit.fill,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              "Words by Picture",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFF6FAEF2)),
+                            ),
+                          ],
+                        ))
+                  ],
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text("History",
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF232253),
+                        fontWeight: FontWeight.w600)),
+              ),
+              Container(
+                width: 500,
+                padding: const EdgeInsets.fromLTRB(0, 25, 0, 20),
+                margin: const EdgeInsets.fromLTRB(0, 15, 0, 15),
+                decoration: BoxDecoration(
+                    border: Border.all(color: Color(0xFFCFCFCF)),
+                    borderRadius: BorderRadius.circular(15)),
+                child: Column(children: [
+                  // Insert code for conditional rendering, if may history ang user or wala
+                  Text("You haven't simplified any text yet.",
+                      style: TextStyle(color: Color(0xFF232253)))
+                ]),
+              )
+            ],
           ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text("History",
-                style: TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF232253),
-                    fontWeight: FontWeight.w600)),
-          ),
-          Container(
-            width: 500,
-            padding: const EdgeInsets.fromLTRB(0, 25, 0, 20),
-            margin: const EdgeInsets.fromLTRB(0, 15, 0, 15),
-            decoration: BoxDecoration(
-                border: Border.all(color: Color(0xFFCFCFCF)),
-                borderRadius: BorderRadius.circular(15)),
-            child: Column(children: [
-              // Insert code for conditional rendering, if may history ang user or wala
-              Text("You haven't simplified any text yet.",
-                  style: TextStyle(color: Color(0xFF232253)))
-            ]),
-          )
-        ],
-      ),
+        ),
+        _scanningText
+            ? Container(
+                color: Colors.white,
+                width: mediaQuery.size.width,
+                height: (mediaQuery.size.height - mediaQuery.padding.top),
+                child: Center(
+                    child: Padding(
+                        padding: EdgeInsets.fromLTRB(150, 0, 150, 0),
+                        child: LoadingIndicator(
+                          indicatorType: Indicator.ballPulse,
+                          backgroundColor: Colors.white,
+                        ))),
+              )
+            : Container(
+                child: null,
+              )
+      ],
     );
   }
 }
