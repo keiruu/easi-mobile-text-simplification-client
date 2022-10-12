@@ -34,19 +34,7 @@ class _HomeState extends State<Home> {
   bool _scanningText = false;
   var _extractedText;
 
-  Widget getImageWidget() {
-    if (_selectedFile != null) {
-      return Image.file(
-        _selectedFile,
-        width: 250,
-        height: 250,
-        fit: BoxFit.cover,
-      );
-    } else {
-      return Text("Wala image");
-    }
-  }
-
+  // Saves image to gallery
   saveImage() async {
     int currentUnix = DateTime.now().millisecondsSinceEpoch;
 
@@ -73,25 +61,25 @@ class _HomeState extends State<Home> {
     }
   }
 
+  // OCR Scanner using Google ML Kit
   getRecognizedText(final inputImage) async {
     final textDetector = GoogleMlKit.vision.textRecognizer();
     List<TextElement> _elements = [];
     List<TextLine> _lines = [];
     final results;
 
+    // Processes image
     RecognizedText recognizedText = await textDetector.processImage(inputImage);
-    print("WE are here");
-    this.setState(() {
-      globals.inProcess = true;
-    });
     await textDetector.close();
 
     String scannedText = "";
 
     for (TextBlock block in recognizedText.blocks) {
       for (TextLine line in block.lines) {
-        // Checks if the last character of the line is -
-        // it will join it with the next word instead of adding a space
+        // Checks if the last character of the line is "-" 
+        // ex. "Gusto ko maging hat-
+        // ex. dog ngayon."
+        // then it will join it with the next word instead of adding a space
         String currentLine = "";
         var checker = line.text.substring(line.text.length - 1);
 
@@ -110,6 +98,7 @@ class _HomeState extends State<Home> {
       }
     }
 
+    // Sends extracted text for simplification
     results = await postSimplifyText(scannedText);
     setState(() {
       _extractedText = scannedText;
@@ -120,18 +109,17 @@ class _HomeState extends State<Home> {
     // Save cropped image
     // saveImage();
 
+    // Goes to AR Overlay screen
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => ImageScreen(_selectedFile, _extractedText,
             recognizedText, _elements, _lines, results),
       ),
     );
-    // Send scanned text to backend. Refer to text_simplification.dart for the process.
-    // After that take the translated text and manage to display it over the image you took.
-    // Additional is to change from cropped image to select certain or multiple sentences in a picture.
-    // More stuff to add, maybe a dictionary? or something to display for learners to read better.
+
   }
 
+  // Code for loading image from camera or gallery and showing the crop tool
   getImage(ImageSource source) async {
     // this.setState(() {
     //   globals.inProcess = true;

@@ -169,6 +169,7 @@ class _ImageScreenState extends State<ImageScreen> {
   }
 }
 
+// FOR AR OVERLAY
 class TextDetectorPainter extends CustomPainter {
   TextDetectorPainter(this.absoluteImageSize, this.elements, this.lines,
       this.extractedText, this.results);
@@ -200,7 +201,7 @@ class TextDetectorPainter extends CustomPainter {
       ..color = Colors.white
       ..strokeWidth = 2.0;
 
-    // Color in each element
+    // Color in each element (word)
     for (TextElement element in elements) {
       canvas.drawRect(scaleRect(element), paint);
     }
@@ -210,7 +211,7 @@ class TextDetectorPainter extends CustomPainter {
       canvas.drawRect(scaleRect(line), paint);
     }
 
-    // Get rid of next line
+    // Get rid of next line so that it's all one paragraph
     final List noNextLine = results.split('\n');
     // Loop through the list and store into string.
     String wordsToBeSplit = "";
@@ -226,14 +227,14 @@ class TextDetectorPainter extends CustomPainter {
     int endLength = 0;
 
     for (TextLine line in lines) {
-      // list of words in a line, lineSplit.length = pila ka words ara sa isa ka line.
+      // lineSplit.length = pila ka words ara sa isa ka line.
       final List lineSplit = line.text.split(' ');
       String result = "";
       int len = lineSplit.length;
       print("Line split length $len");
       for (var x = 0; x <= lineSplit.length; x++) {
         // Stitches together the line based on the number of words sa original text
-        // minus 2 kay for some reason sobra ang length by 2 ang results
+        // minus 2 kay for some reason sobra ang length sang results by 2
         if (num <= words.length && endLength <= words.length - 2) {
           result = result + words[num] + " ";
           num++;
@@ -251,13 +252,11 @@ class TextDetectorPainter extends CustomPainter {
       num = endLength + 1;
       print("Num $num");
 
-      // I just coded this a few seconds ago and
-      // idk how it works anymore but
-      // what's important is that it does work.
-      // sorry nalang future me if ever e edit mo ni.
+ 
     }
   }
 
+  // Displays all the words processed as an AR Overlay
   void drawName(Canvas context, String text, double size, double x, double y) {
     TextSpan span = TextSpan(
         style: TextStyle(

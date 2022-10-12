@@ -6,7 +6,8 @@ import 'package:http/http.dart' as http;
 // if gagamit ka physical device to debug, run this command sa cmd
 // adb reverse tcp:5000 tcp:5000
 
-// Make a request
+// Accessing backend hosted on heroku
+// sends a request
 
 postSimplifyText(prompt) async {
   var response;

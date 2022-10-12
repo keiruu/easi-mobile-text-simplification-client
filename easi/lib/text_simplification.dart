@@ -19,12 +19,14 @@ class _TextSimplificationState extends State<TextSimplification> {
   bool over = false;
   int counter = 0;
 
+  // Gets prompt from textfield
   void setPrompt() {
     setState(() {
       prompt = inputController.text;
     });
   }
 
+  // Calls function to simplify text (from http_methods.dart)
   void setSimplifiedText(prompt) async {
     try {
       setState(() {
