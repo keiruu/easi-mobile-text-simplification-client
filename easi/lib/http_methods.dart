@@ -13,7 +13,7 @@ postSimplifyText(prompt) async {
   var response;
   
   try {
-    var url = Uri.parse('https://easi-backend.herokuapp.com/translate');
+    var url = Uri.parse('https://easi-backend.onrender.com/translate');
     response = await http.post(
       url,
       headers: <String, String>{
