@@ -5,15 +5,18 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:easi/globals.dart' as globals;
 import 'package:loading_indicator/loading_indicator.dart';
-
+import 'package:firebase_core/firebase_core.dart';
 import 'home.dart';
 import 'words_in_picture.dart';
 import 'profile.dart';
+import 'package:easi/screens/login_screen.dart';
+
 
 // void main() => runApp(MyApp());
-void main() {
+void main() async{
   // Transparent status bar
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
   ));
@@ -29,7 +32,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Inter'),
-      home: MyHomePage(),
+      home: LoginScreen(),
     );
   }
 }

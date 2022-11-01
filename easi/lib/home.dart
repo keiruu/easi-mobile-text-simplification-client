@@ -9,7 +9,7 @@ import 'image_output_screen.dart';
 import 'dart:io';
 import 'http_methods.dart';
 import 'history.dart';
-
+import 'package:easi/model/user_model.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -19,16 +19,37 @@ import 'package:gallery_saver/gallery_saver.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'dart:convert';
+import 'package:easi/screens/login_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'screens/login_screen.dart';
 import 'package:easi/globals.dart' as globals;
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
   @override
-  State<Home> createState() => _HomeState();
+ _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
+
+   User? user = FirebaseAuth.instance.currentUser;
+  UserModel loggedInUser = UserModel();
+//shows user info sa may homepage
+  @override
+  void initState() {
+    super.initState();
+    FirebaseFirestore.instance
+        .collection("users")
+        .doc(user!.uid)
+        .get()
+        .then((value) {
+      loggedInUser = UserModel.fromMap(value.data());
+      setState(() {});
+    });
+  }
+
   String userName = "User";
   var _selectedFile;
   bool _scanningText = false;
@@ -194,16 +215,16 @@ class _HomeState extends State<Home> {
                   children: [
                     Text(
                       'Hi ',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24,
-                          color: Color(0xFF232253)),
-                    ),
-                    Text('$userName 👋',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 24,
-                            color: Color(0xFF5274AE)))
+                       style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                      color: Color(0xFF232253)),
+                      ),
+                    Text('"${loggedInUser.fullname}" 👋',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                        color: Color(0xFF5274AE)))
                   ],
                 ),
               ),
@@ -404,7 +425,7 @@ class _HomeState extends State<Home> {
             : Container(
                 child: null,
               )
-      ],
+      ],//ari
     );
   }
 }
