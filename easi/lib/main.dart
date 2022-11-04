@@ -46,7 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
   // Bottom navigation screen options
-  List<Widget> _widgetOptions = <Widget>[Home(), Profile()];
+  List<Widget> _widgetOptions = <Widget>[Home(), Profile(userKey: '',)]; //di ko sure kay ga error ang sa profile. Gn butangan lang sng userKey
   @override
   Widget build(BuildContext context) {
     return Scaffold(
