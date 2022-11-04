@@ -220,7 +220,7 @@ class _HomeState extends State<Home> {
                       fontSize: 24,
                       color: Color(0xFF232253)),
                       ),
-                    Text('"${loggedInUser.fullname}" 👋',
+                    Text('"${loggedInUser.uid}" 👋',
                     style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 24,
@@ -247,6 +247,7 @@ class _HomeState extends State<Home> {
                           color: Color(0xFF232253),
                           fontWeight: FontWeight.w600)),
                 ),
+                
               ),
               Padding(
                 padding: EdgeInsets.only(bottom: 30),

@@ -2,9 +2,11 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'http_methods.dart';
 import 'package:loading_indicator/loading_indicator.dart';
-
+import 'package:firebase_database/firebase_database.dart';
 import 'main.dart';
-
+import 'package:easi/model/user_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 class TextSimplification extends StatefulWidget {
   @override
   _TextSimplificationState createState() => _TextSimplificationState();
@@ -12,20 +14,29 @@ class TextSimplification extends StatefulWidget {
 
 class _TextSimplificationState extends State<TextSimplification> {
   TextEditingController inputController = TextEditingController();
+   User? user = FirebaseAuth.instance.currentUser;
+  UserModel loggedInUser = UserModel();
   var simplifiedResult;
+
+  String? uid;
   String simplified = "";
   String prompt = "";
   bool loading = false;
   bool over = false;
   int counter = 0;
-
+ late DatabaseReference dbRef;
   // Gets prompt from textfield
   void setPrompt() {
     setState(() {
       prompt = inputController.text;
     });
   }
-
+ @override
+  void initState() {
+    super.initState();
+    dbRef = FirebaseDatabase.instance.ref().child('User');
+  }
+ 
   // Calls function to simplify text (from http_methods.dart)
   void setSimplifiedText(prompt) async {
     try {
@@ -156,6 +167,8 @@ class _TextSimplificationState extends State<TextSimplification> {
                             : () {
                                 setPrompt();
                                 setSimplifiedText(prompt);
+                                dbRef.push().set(simplifiedResult);
+                                dbRef.push().set(uid);
                               },
                         child: Text('Simplify'),
                       )),
