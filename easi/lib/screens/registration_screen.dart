@@ -1,17 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easi/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import '../auth_service.dart';
 import '../google_sign_in.dart';
 import '/model/user_model.dart';
 import '/screens/login_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-
 class RegistrationScreen extends StatefulWidget {
-  const RegistrationScreen({ Key? key }) : super(key: key);
+  const RegistrationScreen({Key? key}) : super(key: key);
 
   @override
   State<RegistrationScreen> createState() => _RegistrationScreenState();
@@ -26,28 +27,26 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final emailEditingController = new TextEditingController();
   final passwordEditingController = new TextEditingController();
 
-
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
     //fullName Field
     final fullNameField = TextFormField(
       autofocus: false,
       controller: fullNameEditingController,
       keyboardType: TextInputType.name,
       //validator: () {},
-       validator: (value){
+      validator: (value) {
         RegExp regex = new RegExp(r'^.{3,}$');
-        if(value!.isEmpty)
-        {
-          return("Full Name Required");
+        if (value!.isEmpty) {
+          return ("Full Name Required");
         }
-        if(!regex.hasMatch(value)){
-         return("Please Enter Valid Name(Min. 6 Character");
+        if (!regex.hasMatch(value)) {
+          return ("Please Enter Valid Name(Min. 6 Character");
         }
         return null;
       },
-      onSaved: (value)
-      {
+      onSaved: (value) {
         fullNameEditingController.text = value!;
       },
       //icon
@@ -57,10 +56,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         labelText: 'Full Name',
         hintText: "Full Name",
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5),
-        )
-
+        enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFCFCFCF))),
+        focusedBorder:
+            OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
       ),
     );
     //email Field
@@ -69,22 +68,18 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       controller: emailEditingController,
       keyboardType: TextInputType.emailAddress,
       //validator: () {},
-       validator: (value)
-      {
-        if(value!.isEmpty)
-        {
+      validator: (value) {
+        if (value!.isEmpty) {
           return ("Enter your Email");
         }
         //reg expression for eail validation
-        if(!RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]").hasMatch(value)){
-          return("Please Enter your Email");
-
+        if (!RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]").hasMatch(value)) {
+          return ("Please Enter your Email");
         }
         return null;
       },
-      onSaved: (value)
-      {
-       emailEditingController.text = value!;
+      onSaved: (value) {
+        emailEditingController.text = value!;
       },
       //icon
       textInputAction: TextInputAction.next,
@@ -93,10 +88,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         labelText: 'Email',
         hintText: "Email",
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5),
-        )
+        enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFCFCFCF))),
+        focusedBorder:
+            OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
+        // border: OutlineInputBorder(
+        //   borderRadius: BorderRadius.circular(5),
+        //   borderSide: BorderSide(width: 3, color: Colors.greenAccent), //<-- SEE HERE
 
+        // )
       ),
     );
     //Password
@@ -105,21 +105,18 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       controller: passwordEditingController,
       obscureText: true,
       //validator: () {},
-      
-      validator: (value){
+
+      validator: (value) {
         RegExp regex = RegExp(r'^.{6,}$');
-        if(value!.isEmpty)
-        {
-          return("Password is required");
+        if (value!.isEmpty) {
+          return ("Password is required");
         }
-        if(!regex.hasMatch(value)){
-         return("Please Enter Valid Password(Min. 6 Character");
+        if (!regex.hasMatch(value)) {
+          return ("Please Enter Valid Password(Min. 6 Character");
         }
         return null;
-        
       },
-      onSaved: (value)
-      {
+      onSaved: (value) {
         passwordEditingController.text = value!;
       },
       //icon
@@ -129,147 +126,158 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         labelText: 'Password',
         hintText: "Password",
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5),
-        )
-
+        enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFCFCFCF))),
+        focusedBorder:
+            OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
       ),
     );
 
     final signupButton = Material(
-  elevation: 5,
-  borderRadius: BorderRadius.circular(5),
-  color: Color(0xFF1565c0),
-  child: MaterialButton(
-    padding: EdgeInsets.fromLTRB(20, 15, 20, 20),
-    minWidth: MediaQuery.of(context).size.width,
-    onPressed: () {
-    signUp(emailEditingController.text, passwordEditingController.text);
-    },
-    child: Text("Register",  style: TextStyle(color: (Colors.white)),
-    ),
-    
-    ),
-);
+      elevation: 0,
+      borderRadius: BorderRadius.circular(5),
+      color: Color(0xFF5274AE),
+      child: MaterialButton(
+        padding: EdgeInsets.fromLTRB(20, 15, 20, 20),
+        minWidth: MediaQuery.of(context).size.width,
+        onPressed: () async {
+          await authService
+              .createUserWithEmailAndPassword(
+                  emailEditingController.text,
+                  passwordEditingController.text,
+                  fullNameEditingController.text)
+              .catchError((e) {
+            Fluttertoast.showToast(msg: e!.message);
+          });
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => MyHomePage(),
+            ),
+          );
+        },
+        child: Text(
+          "Register",
+          style: TextStyle(color: (Colors.white)),
+        ),
+      ),
+    );
 
-final googlelog = Material(
-  elevation: 5,
-  borderRadius: BorderRadius.circular(5),
-   color: Colors.white);
+    final googlelog = Material(
+        elevation: 5,
+        borderRadius: BorderRadius.circular(5),
+        color: Colors.white);
     MaterialButton(
-    padding: EdgeInsets.fromLTRB(20, 15, 20, 20),
-    minWidth: MediaQuery.of(context).size.width,
-    onPressed: () {
-                context.read<FirebaseAuthMethods>().signInWithGoogle(context);
-             
-
-    },
-    child: Container(
-                alignment: Alignment.center,
-                child: Text(
-                  'Sign in with Google',
-                  style: TextStyle(color: (Colors.white),
-                 ),
-                )),
-    
+      padding: EdgeInsets.fromLTRB(20, 15, 20, 20),
+      minWidth: MediaQuery.of(context).size.width,
+      onPressed: () {
+        context.read<FirebaseAuthMethods>().signInWithGoogle(context);
+      },
+      child: Container(
+          alignment: Alignment.center,
+          child: Text(
+            'Sign in with Google',
+            style: TextStyle(
+              color: (Colors.white),
+            ),
+          )),
     );
 
     return Scaffold(
-      
       backgroundColor: Colors.white,
       body: Center(
         child: SingleChildScrollView(
-          child: Container(
-            color:Colors.white,
-            child:Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-
-                Container(
-                alignment: Alignment.center,
-                padding: const EdgeInsets.all(50),
-                child: const Text(
-                  'Welcome!',
-                  style: TextStyle(color: Color(0xFF1976D2), fontWeight: FontWeight.w900, fontSize: 30),
-                )),
-                    
-                    fullNameField,
-                    SizedBox(height: 30),
-                    emailField,
-                    SizedBox(height: 30),
-                    passwordField,
-                     SizedBox(height: 30),
-                    signupButton,
-                    SizedBox(height: 30),
-                    googlelog,
-                     SizedBox(height: 10),
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-
-                        children: <Widget>[
-                          Text("Already have an account? "),
-                          GestureDetector(onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder:((context) =>  LoginScreen()))
-                            );
-                          },
-                          child: Text("Log in Here", 
-                          style: TextStyle(decoration: TextDecoration.underline,
-                          fontWeight: FontWeight.w400,fontSize:15, color: Color(0xFF1565c0),),),
-                          )
-
-                        ],
-                      )
-                      ]
-                )
-              ),
-            )
-          )
-        ),
+            child: Container(
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Form(
+                      key: _formKey,
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.all(50),
+                                child: const Text(
+                                  'Welcome!',
+                                  style: TextStyle(
+                                      color: Color(0xFF5274AE),
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 30),
+                                )),
+                            fullNameField,
+                            SizedBox(height: 30),
+                            emailField,
+                            SizedBox(height: 30),
+                            passwordField,
+                            SizedBox(height: 30),
+                            signupButton,
+                            SizedBox(height: 30),
+                            googlelog,
+                            SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text("Already have an account? "),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: ((context) =>
+                                                LoginScreen())));
+                                  },
+                                  child: Text(
+                                    "Log in Here",
+                                    style: TextStyle(
+                                      decoration: TextDecoration.underline,
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 15,
+                                      color: Color(0xFF1565c0),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            )
+                          ])),
+                ))),
       ),
     );
   }
 
+  // void signUp(String email, String password) async
+  // {
+  //   if(_formKey.currentState!.validate())
+  //   {
+  //     await _auth.createUserWithEmailAndPassword(email: email, password: password)
+  //     .then((value) =>  {postDetailsToFirestore()})
+  //     .catchError((e){
+  //         Fluttertoast.showToast(msg: e!.message);
+  //       });
+  //   }
+  // }
 
-  void signUp(String email, String password) async
-  {
-    if(_formKey.currentState!.validate())
-    {
-      await _auth.createUserWithEmailAndPassword(email: email, password: password)
-      .then((value) =>  {postDetailsToFirestore()})
-      .catchError((e){
-          Fluttertoast.showToast(msg: e!.message);
-        });
-    }
-  }
+  // postDetailsToFirestore() async{
+  //   //call firestore, usermodel and send values
 
-  postDetailsToFirestore() async{
-  //call firestore, usermodel and send values
-  
-  FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-  User? user = _auth.currentUser;
+  //   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+  //   User? user = _auth.currentUser;
 
-  UserModel userModel = UserModel();
-  //values
+  //   UserModel userModel = UserModel();
+  //   //values
 
-  userModel.email = user!.email;
-  userModel.uid = user.uid;
-  userModel.fullname = fullNameEditingController.text;
+  //   userModel.email = user!.email;
+  //   userModel.uid = user.uid;
+  //   userModel.fullname = fullNameEditingController.text;
 
-  await firebaseFirestore
-  .collection("users")
-  .doc(user.uid)
-  .set(userModel.toMap());
-  Fluttertoast.showToast(msg: "Account Created Successfully: ) ");
-  
-  Navigator.pushAndRemoveUntil((context), MaterialPageRoute(builder: (context) => HomeScreen()),
-   (route) => false);
+  //   await firebaseFirestore
+  //   .collection("users")
+  //   .doc(user.uid)
+  //   .set(userModel.toMap());
+  //   Fluttertoast.showToast(msg: "Account Created Successfully: ) ");
 
-
-
-  }
+  //   Navigator.pushAndRemoveUntil((context), MaterialPageRoute(builder: (context) => HomeScreen()),
+  //   (route) => false);
+  // }
 }
