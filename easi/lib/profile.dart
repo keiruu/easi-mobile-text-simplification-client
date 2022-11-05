@@ -6,181 +6,197 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/model/user_model.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:loading_indicator/loading_indicator.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
+import 'auth_service.dart';
 
 class Profile extends StatefulWidget {
-  const Profile({Key? key, required this.userKey }) : super(key: key);
+  const Profile({Key? key, required this.userKey}) : super(key: key);
   final String userKey;
   @override
-   _ProfileState createState() => _ProfileState();
+  _ProfileState createState() => _ProfileState();
 }
 
 class _ProfileState extends State<Profile> {
   //for updating user info
-  final  userNameController = TextEditingController();
-  final  userEmailController = TextEditingController();
-  final  userPasswordController = TextEditingController();
-  final  userConfirmpasswordController = TextEditingController();
-
+  final userNameController = TextEditingController();
+  final userEmailController = TextEditingController();
+  final userPasswordController = TextEditingController();
+  final userConfirmpasswordController = TextEditingController();
+  final _auth = FirebaseAuth.instance;
+  String _dp = "", _email = "";
   User? user = FirebaseAuth.instance.currentUser;
-  UserModel loggedInUser = UserModel();
+  // UserModel loggedInUser = UserModel();
   late DatabaseReference dbRef;
- 
+  var userExists;
+
   @override
   void initState() {
-
     super.initState();
     //Get user info from the real time database
     dbRef = FirebaseDatabase.instance.ref().child('Users');
-    //Shows user information from the database
-      getUserData();
-        FirebaseFirestore.instance
-        .collection("users")
-        .doc(user!.uid)
-        .get()
-        .then((value) {
-      loggedInUser = UserModel.fromMap(value.data());
-      setState(() {});
-    });
+    // userNameController.addListener(_change);
+    // userEmailController.addListener(_change);
+    //Shows user information from the database'
+    // FirebaseFirestore.instance
+    //     .collection("users")
+    //     .doc(user!.uid)
+    //     .get()
+    //     .then((value) {
+    //   loggedInUser = UserModel.fromMap(value.data());
+    //   setState(() {
+    //     userExists = loggedInUser;
+    //   });
+    // });
   }
-  
-  void getUserData() async {
-    DataSnapshot snapshot = await dbRef.child(widget.userKey).get();
- 
-    Map user = snapshot.value as Map;
- 
-    userNameController.text = user['Name'];
-    userEmailController.text = user['Email'];
-    userPasswordController.text = user['Password'];
-    userConfirmpasswordController.text = user['Confirm Password'];
-  }
+
+  // void _change() {
+  //   setState(() {
+  //     _dp = userNameController.text;
+  //     _email = userEmailController.text;
+  //   });
+  // }
+
+  // void _authChange(dp, email) {
+  //   setState(() {
+  //     _dp = dp;
+  //     _email = email;
+  //   });
+  // }
+
+//  This is the code for update. Need gd anay butang ang Email, Password kag fullname sa realtime database
   @override
   Widget build(BuildContext context) {
-   
-      return Padding(
-      padding: const EdgeInsets.fromLTRB(35, 5, 35, 0),
-      child: Column(
-        children: [
-          Align(
-            alignment: Alignment.center,
-            child: Column(
-              children: [
-                Text(
-                  "${loggedInUser.fullname}",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30,
-                      color: Color(0xFF232253))),
+    final mediaQuery = MediaQuery.of(context);
+    final authService = Provider.of<AuthService>(context);
 
-                Text("${loggedInUser.email}",
-                    style: const TextStyle(
-                        fontWeight: FontWeight.normal,
-                        fontSize: 11,
-                        color: Color(0xFF232253)))
-              ],
-            ),
-          ),
-        ]
+    return Column(children: [
+      Container(
+        alignment: Alignment.centerLeft,
+        padding: EdgeInsets.fromLTRB(25, 100, 0, 20),
+        child: Text(
+          "Edit Profile",
+          textAlign: TextAlign.left,
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        ),
       ),
-      );  
-       
+      Padding(
+        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 25),
+        child: TextFormField(
+          autofocus: false,
+          controller: userNameController,
+          keyboardType: TextInputType.emailAddress,
+          textInputAction: TextInputAction.next,
+          decoration: InputDecoration(
+              prefixIcon: Icon(Icons.person),
+              contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+              labelText: "Name",
+              hintText: "Name",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(5),
+              )),
+        ),
+      ),
+      Padding(
+          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 25),
+          child: TextFormField(
+            autofocus: false,
+            controller: userEmailController,
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+                prefixIcon: Icon(Icons.mail),
+                contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+                labelText: 'Email',
+                hintText: "Email",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5),
+                )),
+          )),
+      Padding(
+          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 25),
+          child: TextFormField(
+            autofocus: false,
+            controller: userPasswordController,
+            textInputAction: TextInputAction.done,
+            decoration: InputDecoration(
+              prefixIcon: Icon(Icons.lock),
+              contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+              labelText: 'Password',
+              hintText: "Password",
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5),
+                  borderSide: BorderSide(
+                      style: BorderStyle.none, color: Color(0xFFCFCFCF))),
+            ),
+          )),
+      Padding(
+          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 25),
+          child: TextFormField(
+            autofocus: false,
+            controller: userConfirmpasswordController,
+            textInputAction: TextInputAction.done,
+            decoration: InputDecoration(
+                prefixIcon: Icon(Icons.lock),
+                contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+                labelText: 'Confirm Password',
+                hintText: "Confirm Password",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5),
+                )),
+          )),
+      Padding(
+        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 25),
+        child: MaterialButton(
+          onPressed: () async {
+            // Map<String, String> students = {
+            //   'Name': userNameController.text,
+            //   'Email': userEmailController.text,
+            //   'Password': userPasswordController.text,
+            //   'Confirm Password': userConfirmpasswordController.text
+            // };
+            await authService.updateProfile(
+                userNameController.text,
+                userEmailController.text,
+                userPasswordController.text,
+                userConfirmpasswordController.text);
+            // updateUser(
+            //     userNameController.text,
+            //     userEmailController.text,
+            //     userPasswordController.text,
+            //     userConfirmpasswordController.text);
+            // dbRef.child(widget.UserKey).update(students)
+            // .then((value) => {
+            //     Navigator.pop(context)
+            // });
+          },
+          child: const Text('Save'),
+          color: Color(0xFFCDDBF2),
+          padding: const EdgeInsets.fromLTRB(20, 15, 20, 20),
+          textColor: Color(0xFF5274AE),
+          minWidth: 320,
+          height: 40,
+          elevation: 0,
+        ),
+      ),
+      Padding(
+        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 25),
+        child: MaterialButton(
+          onPressed: () async {
+            await authService.signout();
+          },
+          child: const Text('Sign out'),
+          color: Color(0xFFCDDBF2),
+          padding: const EdgeInsets.fromLTRB(20, 15, 20, 20),
+          textColor: Color(0xFF5274AE),
+          minWidth: 320,
+          height: 40,
+          elevation: 0,
+        ),
+      )
+    ]);
   }
-  
- //This is the code for update. Need gd anay butang ang Email, Password kag fullname sa realtime database
-  // @override
-  // Widget build (BuildContext context) {
-  //   var scaffold = Scaffold(
-  //   final fullnameField = TextFormField(
-  //     autofocus: false,
-  //     controller: UserNameController,
-  //     keyboardType: TextInputType.emailAddress,
-  //     textInputAction: TextInputAction.next,
-  //     decoration: InputDecoration(
-  //       prefixIcon: Icon(Icons.mail),
-  //       contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-  //       labelText: "${loggedInUser.fullname}",
-  //       hintText: "Full Name",
-  //       border: OutlineInputBorder(
-  //         borderRadius: BorderRadius.circular(5),
-  //       )
-
-  //     ),
-  //   );
-    
-  //   final emailField = TextFormField(
-  //     autofocus: false,
-  //     controller: UserEmailController,
-  //     keyboardType: TextInputType.emailAddress,
-  //     textInputAction: TextInputAction.next,
-  //     decoration: InputDecoration(
-  //       prefixIcon: Icon(Icons.mail),
-  //       contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-  //       labelText: '"${loggedInUser.email}"',
-  //       hintText: "Email",
-  //       border: OutlineInputBorder(
-  //         borderRadius: BorderRadius.circular(5),
-  //       )
-
-  //     ),
-  //   );
-  //    final passwordField = TextFormField(
-  //     autofocus: false,
-  //     controller: UserPasswordController,
-  //      textInputAction: TextInputAction.done,
-  //     decoration: InputDecoration(
-  //       prefixIcon: Icon(Icons.lock),
-  //       contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-  //       labelText: 'Password',
-  //       hintText: "Password",
-  //       border: OutlineInputBorder(
-  //         borderRadius: BorderRadius.circular(5),
-  //       )
-
-  //     ),
-  //   ); 
-  //     final confirmpasswordField = TextFormField(
-  //     autofocus: false,
-  //     controller: UserConfirmpasswordController,
-  //      textInputAction: TextInputAction.done,
-  //     decoration: InputDecoration(
-  //       prefixIcon: Icon(Icons.lock),
-  //       contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-  //       labelText: 'Password',
-  //       hintText: "Password",
-  //       border: OutlineInputBorder(
-  //         borderRadius: BorderRadius.circular(5),
-  //       )
-
-  //     ),
-  //   );
-  //   MaterialButton(
-  //               onPressed: () {
- 
-  //                 Map<String, String> students = {
-  //                   'Name': UserNameController.text,
-  //                   'Email': UserEmailController.text,
-  //                   'Password': UserPasswordController.text
-  //                   'Confirm Password': UserConfirmpasswordController.text
-  //                 };
- 
-  //                 dbRef.child(widget.UserKey).update(User)
-  //                 .then((value) => {
-  //                    Navigator.pop(context) 
-  //                 });
- 
-  //               },
-  //               child: const Text('Save'),
-  //               color: Colors.blue,
-  //               padding: const EdgeInsets.fromLTRB(20, 15, 20, 20),
-  //               textColor: Colors.blue,
-  //               minWidth: 300,
-  //               height: 40,
-  //             ),
-  //   );
-  //   return scaffold;
-   
-  // }
-   
-  
-
-  }
+}

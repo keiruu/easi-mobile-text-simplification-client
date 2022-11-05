@@ -1,5 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'auth_service.dart';
 import 'http_methods.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -7,6 +9,7 @@ import 'main.dart';
 import 'package:easi/model/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 class TextSimplification extends StatefulWidget {
   @override
   _TextSimplificationState createState() => _TextSimplificationState();
@@ -14,8 +17,8 @@ class TextSimplification extends StatefulWidget {
 
 class _TextSimplificationState extends State<TextSimplification> {
   TextEditingController inputController = TextEditingController();
-   User? user = FirebaseAuth.instance.currentUser;
-  UserModel loggedInUser = UserModel();
+  User? user = FirebaseAuth.instance.currentUser;
+  // UserModel loggedInUser = UserModel();
   var simplifiedResult;
 
   String? uid;
@@ -24,21 +27,24 @@ class _TextSimplificationState extends State<TextSimplification> {
   bool loading = false;
   bool over = false;
   int counter = 0;
- late DatabaseReference dbRef;
+
+  late DatabaseReference dbRef;
+
   // Gets prompt from textfield
   void setPrompt() {
     setState(() {
       prompt = inputController.text;
     });
   }
- @override
+
+  @override
   void initState() {
     super.initState();
-    dbRef = FirebaseDatabase.instance.ref().child('User');
+    dbRef = FirebaseDatabase.instance.ref().child('history');
   }
- 
+
   // Calls function to simplify text (from http_methods.dart)
-  void setSimplifiedText(prompt) async {
+  void setSimplifiedText(prompt, uid) async {
     try {
       setState(() {
         loading = true;
@@ -49,14 +55,53 @@ class _TextSimplificationState extends State<TextSimplification> {
         simplified = simplifiedResult;
         loading = false;
       });
+      pushHistory(uid);
     } catch (e) {
       print("Error simplifying text");
       print(e);
     }
   }
 
+  void pushHistory(uid) {
+    DateTime now = DateTime.now();
+    var MONTHS = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ];
+    print(simplified);
+    dbRef.push().set({
+      "prompt": prompt,
+      "result": simplified,
+      "userUID": uid,
+      // "time": now.hour.toString() + ":" + now.minute.toString() + ":" + now.second.toString(),
+      "date": now.day.toString() +
+          " " +
+          MONTHS[now.month - 1] +
+          " " +
+          now.year.toString() +
+          " " +
+          now.hour.toString() +
+          ":" +
+          now.minute.toString() +
+          ":" +
+          now.second.toString()
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -76,9 +121,10 @@ class _TextSimplificationState extends State<TextSimplification> {
                   child: LoadingIndicator(
                     indicatorType: Indicator.ballPulse,
                   )))
-          : Center(
+          : SingleChildScrollView(
+            child: Center(
               child: Padding(
-              padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
+              padding: EdgeInsets.fromLTRB(15, 50, 15, 0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -164,17 +210,18 @@ class _TextSimplificationState extends State<TextSimplification> {
                         ),
                         onPressed: over
                             ? null
-                            : () {
+                            : () async {
                                 setPrompt();
-                                setSimplifiedText(prompt);
-                                dbRef.push().set(simplifiedResult);
-                                dbRef.push().set(uid);
+                                setSimplifiedText(prompt, authService.uid);
+                                // dbRef.push().set(simplifiedResult);
+                                // dbRef.push().set(uid);
                               },
                         child: Text('Simplify'),
                       )),
                 ],
               ),
             )),
+          )
     );
   }
 }
