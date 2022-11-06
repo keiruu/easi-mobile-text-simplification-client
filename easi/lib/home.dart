@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:easi/image_output_screen.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:provider/provider.dart';
 
 import 'auth_service.dart';
@@ -38,10 +39,24 @@ class _HomeState extends State<Home> {
   // User? user = FirebaseAuth.instance.currentUser;
   // UserModel loggedInUser = UserModel();
   var userExists;
+  User? user = FirebaseAuth.instance.currentUser;
+  late DatabaseReference dbRef;
+
+  TextEditingController textEditingController = TextEditingController();
+
+  @override
+  void dispose() {
+    textEditingController.dispose();
+    // ignore: avoid_print
+    print('Dispose used');
+    super.dispose();
+  }
+
 //shows user info sa may homepage
   @override
   void initState() {
     super.initState();
+    dbRef = FirebaseDatabase.instance.ref().child('history');
     // FirebaseFirestore.instance
     //     .collection("users")
     //     .doc(user!.uid)
@@ -86,8 +101,45 @@ class _HomeState extends State<Home> {
     }
   }
 
+  void pushHistory(String prompt, String simplified, uid) {
+    DateTime now = DateTime.now();
+    var MONTHS = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ];
+    print(simplified);
+    dbRef.push().set({
+      "prompt": prompt,
+      "result": simplified,
+      "userUID": uid,
+      "placeholder": " ",
+      // "time": now.hour.toString() + ":" + now.minute.toString() + ":" + now.second.toString(),
+      "date": now.day.toString() +
+          " " +
+          MONTHS[now.month - 1] +
+          " " +
+          now.year.toString() +
+          " " +
+          now.hour.toString() +
+          ":" +
+          now.minute.toString() +
+          ":" +
+          now.second.toString()
+    });
+  }
+
   // OCR Scanner using Google ML Kit
-  getRecognizedText(final inputImage) async {
+  getRecognizedText(final inputImage, String? uid) async {
     final textDetector = GoogleMlKit.vision.textRecognizer();
     List<TextElement> _elements = [];
     List<TextLine> _lines = [];
@@ -129,6 +181,8 @@ class _HomeState extends State<Home> {
       _extractedText = scannedText;
       _scanningText = false;
     });
+
+    pushHistory(_extractedText, results, uid);
     // print(_extractedText);
 
     // Save cropped image
@@ -144,7 +198,7 @@ class _HomeState extends State<Home> {
   }
 
   // Code for loading image from camera or gallery and showing the crop tool
-  getImage(ImageSource source) async {
+  getImage(ImageSource source, String? uid) async {
     // this.setState(() {
     //   globals.inProcess = true;
     // });
@@ -188,7 +242,7 @@ class _HomeState extends State<Home> {
       // Send text for extraction
       if (_selectedFile != null) {
         final inputImage = InputImage.fromFile(_selectedFile);
-        getRecognizedText(inputImage);
+        getRecognizedText(inputImage, uid);
         this.setState(() {
           globals.inProcess = false;
         });
@@ -206,6 +260,8 @@ class _HomeState extends State<Home> {
     // For calculating total height of screen
     final mediaQuery = MediaQuery.of(context);
     final authService = Provider.of<AuthService>(context);
+    final name = FirebaseAuth.instance.currentUser?.displayName;
+    final uid = FirebaseAuth.instance.currentUser?.uid;
 
     var userExists = "";
     return Material(
@@ -226,7 +282,7 @@ class _HomeState extends State<Home> {
                             fontSize: 24,
                             color: Color(0xFF232253)),
                       ),
-                      Text('${authService.inUser?.displayName} 👋',
+                      Text('${name} 👋',
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 24,
@@ -316,7 +372,7 @@ class _HomeState extends State<Home> {
                                                     Size.fromHeight(40)),
                                             onPressed: () {
                                               Navigator.pop(dialogContext);
-                                              getImage(ImageSource.camera);
+                                              getImage(ImageSource.camera, uid);
                                             },
                                             child: Text('Camera',
                                                 style: TextStyle(
@@ -340,7 +396,7 @@ class _HomeState extends State<Home> {
                                                     Size.fromHeight(40)),
                                             onPressed: () {
                                               Navigator.pop(dialogContext);
-                                              getImage(ImageSource.gallery);
+                                              getImage(ImageSource.gallery, uid);
                                             },
                                             child: Text('Gallery',
                                                 style: TextStyle(

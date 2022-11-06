@@ -18,6 +18,7 @@ class TextSimplification extends StatefulWidget {
 class _TextSimplificationState extends State<TextSimplification> {
   TextEditingController inputController = TextEditingController();
   User? user = FirebaseAuth.instance.currentUser;
+  late DatabaseReference dbRef;
   // UserModel loggedInUser = UserModel();
   var simplifiedResult;
 
@@ -28,7 +29,6 @@ class _TextSimplificationState extends State<TextSimplification> {
   bool over = false;
   int counter = 0;
 
-  late DatabaseReference dbRef;
 
   // Gets prompt from textfield
   void setPrompt() {
@@ -83,6 +83,7 @@ class _TextSimplificationState extends State<TextSimplification> {
       "prompt": prompt,
       "result": simplified,
       "userUID": uid,
+      "placeholder": " ",
       // "time": now.hour.toString() + ":" + now.minute.toString() + ":" + now.second.toString(),
       "date": now.day.toString() +
           " " +

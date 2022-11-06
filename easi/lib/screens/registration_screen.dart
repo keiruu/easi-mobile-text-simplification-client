@@ -28,6 +28,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final passwordEditingController = new TextEditingController();
 
   @override
+  void dispose() {
+    fullNameEditingController.dispose();
+    emailEditingController.dispose();
+    passwordEditingController.dispose();
+    // ignore: avoid_print
+    print('Dispose used');
+    super.dispose();
+  }
+
+
+  @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
     //fullName Field

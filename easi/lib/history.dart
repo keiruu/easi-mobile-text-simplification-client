@@ -20,13 +20,23 @@ class _HistoryState extends State<History> {
   var _history;
   int _historyLength = 0;
 
+ TextEditingController textEditingController = TextEditingController();
+ 
+  @override
+  void dispose() {
+    textEditingController.dispose();
+    // ignore: avoid_print
+    print('Dispose used');
+    super.dispose();
+  }
+
   void initState() {
     super.initState();
     final uid = FirebaseAuth.instance.currentUser?.uid;
     dbRef = FirebaseDatabase.instance.ref().child('history');
     final listed = dbRef.orderByChild("userUID").equalTo(uid);
-    print("UasdasdasdadDI");
-    print(uid);
+    // print("UasdasdasdadDI");
+    // print(uid);
 
     var data = [];
     listed.onValue.listen((event) {
@@ -35,7 +45,7 @@ class _HistoryState extends State<History> {
       // );
 
       for (final child in event.snapshot.children) {
-        print(child.value);
+        // print(child.value);
         data.add(child.value);
       }
       // data.forEach((key, value) {
@@ -46,7 +56,7 @@ class _HistoryState extends State<History> {
         //   _history = data.values.toList();
         //   _historyLength = data.values.toList().length;
         // });
-         setState(() {
+        setState(() {
           _history = data;
           _historyLength = data.length;
         });
@@ -54,16 +64,14 @@ class _HistoryState extends State<History> {
 
       _history.forEach((index) {
         if (index["result"].length > 60) {
-          index["result"] = index["result"].substring(0, 60) + "...";
+          index["placeholder"] = index["result"].substring(0, 60) + "...";
         }
 
-        print(index["result"]);
+        // print(index["result"]);
       });
-
-      print(_history.length);
     });
-    print("adasd");
-    print(listed);
+    // print("adasd");
+    // print(listed);
     // WidgetsBinding.instance
     //     .addPostFrameCallback((_) => getHistory(_history, _historyLength));
   }
@@ -83,11 +91,20 @@ class _HistoryState extends State<History> {
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8), color: Colors.white),
               child: InkWell(
+                onTap: () => {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          HistoryDetails(historyDetails: _history[index]),
+                    ),
+                  )
+                },
                 child: Row(
                   children: [
                     Container(
                       width: 240,
-                      child: Text("${_history[index]["result"]}"),
+                      child: Text("${_history[index]["placeholder"]}"),
                     ),
                     Padding(
                       padding: EdgeInsets.only(left: 10),
@@ -98,6 +115,96 @@ class _HistoryState extends State<History> {
               )),
         );
       },
+    );
+  }
+}
+
+class HistoryDetails extends StatelessWidget {
+  // In the constructor, require a Todo.
+  const HistoryDetails({Key? key, required this.historyDetails});
+
+  // Declare a field that holds the Todo.
+  final historyDetails;
+
+  @override
+  Widget build(BuildContext context) {
+    // Use the Todo to create the UI.
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Image.asset(
+          'assets/logo.png',
+          height: 35,
+          width: 35,
+        ),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+            child: Center(
+              child: Padding(
+              padding: EdgeInsets.fromLTRB(15, 50, 15, 0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      alignment: Alignment.centerLeft,
+                      child: Icon(
+                        Icons.arrow_back_rounded,
+                        color: Color(0xFF5274AE),
+                        size: 36,
+                      ),
+                    ),
+                  ),
+                  FractionallySizedBox(
+                    widthFactor: 1,
+                    child: Container(
+                        height: 200,
+                        margin: const EdgeInsets.all(15.0),
+                        padding: const EdgeInsets.all(10.0),
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Color.fromARGB(255, 111, 111, 111),
+                              width: 0.8,
+                            ),
+                            borderRadius: BorderRadius.circular(3)),
+                        child: Text(
+                          '${historyDetails["prompt"]}',
+                          style: TextStyle(fontSize: 16.0),
+                        )),
+                  ),
+                  FractionallySizedBox(
+                    widthFactor: 1,
+                    child: Container(
+                        height: 200,
+                        margin: const EdgeInsets.all(15.0),
+                        padding: const EdgeInsets.all(10.0),
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Color.fromARGB(255, 111, 111, 111),
+                              width: 0.8,
+                            ),
+                            borderRadius: BorderRadius.circular(3)),
+                        child: Text(
+                          '${historyDetails["result"]}',
+                          style: TextStyle(fontSize: 16.0),
+                        )),
+                  ),
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.symmetric(vertical: 8, horizontal: 15),
+                    child: Text("${historyDetails["date"]}", style: TextStyle(color: Colors.grey)),
+                  ),
+                ],
+              ),
+            )),
+          )
     );
   }
 }

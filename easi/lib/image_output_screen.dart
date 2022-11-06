@@ -143,7 +143,15 @@ class _ImageScreenState extends State<ImageScreen> {
                               height: 100,
                               child: SingleChildScrollView(
                                 child: Text(
-                                  widget.results,
+                                  "Results: ${widget.results}",
+                                ),
+                              ),
+                            ),
+                            Container(
+                              height: 100,
+                              child: SingleChildScrollView(
+                                child: Text(
+                                  "Extracted text: ${widget.extractedText}",
                                 ),
                               ),
                             ),

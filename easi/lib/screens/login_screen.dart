@@ -34,6 +34,15 @@ class _LoginScreenState extends State<LoginScreen> {
   get onPressed => null;
 
   @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    // ignore: avoid_print
+    print('Dispose used');
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
     //email

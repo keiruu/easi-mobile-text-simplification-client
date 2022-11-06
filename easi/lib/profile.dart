@@ -34,6 +34,18 @@ class _ProfileState extends State<Profile> {
   var userExists;
 
   @override
+  void dispose() {
+    userNameController.dispose();
+    userEmailController.dispose();
+    userPasswordController.dispose();
+    userConfirmpasswordController.dispose();
+
+    // ignore: avoid_print
+    print('Dispose used');
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     //Get user info from the real time database
