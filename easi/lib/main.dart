@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
-        theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Inter'),
+        theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Inter', scaffoldBackgroundColor: Color(0xFFF6F6F8)),
         // home: LoginScreen(),
         initialRoute: '/',
         routes: {
@@ -63,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
   // Bottom navigation screen options
-  List<Widget> _widgetOptions = <Widget>[Home(), HistoryUI(), Profile(userKey: '',)]; //di ko sure kay ga error ang sa profile. Gn butangan lang sng userKey
+  List<Widget> _widgetOptions = <Widget>[Home(), HistoryUI(), ProfileHome()]; //Profile(userKey: '',)di ko sure kay ga error ang sa profile. Gn butangan lang sng userKey
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[_widgetOptions.elementAt(_selectedIndex)],
-          )
+          ),
         ]))
       ,
       bottomNavigationBar: BottomNavigationBar(

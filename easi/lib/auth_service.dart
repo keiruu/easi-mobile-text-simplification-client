@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easi/screens/login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'model/user_model.dart';
 
@@ -63,8 +65,15 @@ class AuthService {
     return _userFromFirebase(credential.user);
   }
 
-  Future<void> signout() async {
-    return await _firebaseAuth.signOut();
+  Future<void> signout(context) async {
+    await _firebaseAuth.signOut();
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LoginScreen(),
+      ),
+    );
   }
 
   Future<void> updateProfile(
@@ -74,13 +83,13 @@ class AuthService {
     if (pass != "" || conpass != "") {
       if (pass == conpass) {
         try {
-          if(email != ""){
+          if (email != "") {
             await inUser?.updateEmail(email);
           }
-          if(displayname != ""){
+          if (displayname != "") {
             await inUser?.updateDisplayName(displayname);
           }
-          if(pass != ""){
+          if (pass != "") {
             await inUser?.updatePassword(pass);
           }
 
@@ -98,24 +107,24 @@ class AuthService {
         Fluttertoast.showToast(msg: "Oh no! Passwords don't match");
       }
     } else {
-       try {
-          if(email != ""){
-            await inUser?.updateEmail(email);
-          }
-          if(displayname != ""){
-            await inUser?.updateDisplayName(displayname);
-          }
-
-          Fluttertoast.showToast(msg: "Successfully updated profile");
-          await inUser?.reload();
-          User? user = inUser;
-          user = await _firebaseAuth.currentUser;
-          //print final version to console
-          print("Registered user:");
-          print(user);
-        } catch (e) {
-          Fluttertoast.showToast(msg: "Problem updating your profile");
+      try {
+        if (email != "") {
+          await inUser?.updateEmail(email);
         }
+        if (displayname != "") {
+          await inUser?.updateDisplayName(displayname);
+        }
+
+        Fluttertoast.showToast(msg: "Successfully updated profile");
+        await inUser?.reload();
+        User? user = inUser;
+        user = await _firebaseAuth.currentUser;
+        //print final version to console
+        print("Registered user:");
+        print(user);
+      } catch (e) {
+        Fluttertoast.showToast(msg: "Problem updating your profile");
+      }
     }
   }
 

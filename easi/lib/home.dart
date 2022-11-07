@@ -265,6 +265,7 @@ class _HomeState extends State<Home> {
 
     var userExists = "";
     return Material(
+      color: Color(0xFFF6F6F8),
       child: Stack(
         children: <Widget>[
           Padding(
