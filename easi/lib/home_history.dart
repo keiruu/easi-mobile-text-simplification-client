@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 
-class History extends StatefulWidget {
-  const History({Key? key}) : super(key: key);
+class HomeHistory extends StatefulWidget {
+  const HomeHistory({Key? key}) : super(key: key);
 
   @override
-  State<History> createState() => _HistoryState();
+  State<HomeHistory> createState() => _HomeHistoryState();
 }
 
-class _HistoryState extends State<History> {
+class _HomeHistoryState extends State<HomeHistory> {
   var _historyText = "";
 
   late DatabaseReference dbRef;
@@ -42,7 +42,7 @@ class _HistoryState extends State<History> {
       if (data != null) {
         setState(() {
           _history = data;
-          _historyLength = data.length;
+          _historyLength = 2;
         });
       }
 
@@ -63,8 +63,7 @@ class _HistoryState extends State<History> {
       itemCount: _historyLength,
       itemBuilder: (BuildContext context, int index) {
         return Container(
-          margin: EdgeInsets.symmetric(vertical: 0, horizontal: 20),
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+          margin: EdgeInsets.only(bottom: 20),
           child: Container(
               padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
               decoration: BoxDecoration(

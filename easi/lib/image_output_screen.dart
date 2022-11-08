@@ -1,9 +1,5 @@
 import 'package:easi/http_methods.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'dart:io';
-import 'dart:ui';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';

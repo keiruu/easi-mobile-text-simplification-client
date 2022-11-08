@@ -1,18 +1,7 @@
 import 'package:easi/history.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:easi/model/user_model.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:loading_indicator/loading_indicator.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
-
-import 'auth_service.dart';
 
 class HistoryUI extends StatefulWidget {
   const HistoryUI({Key? key}) : super(key: key);
@@ -23,15 +12,44 @@ class HistoryUI extends StatefulWidget {
 
 class _HistoryUIState extends State<HistoryUI> {
  
+  late DatabaseReference dbRef;
+  int _historyLength = 0;
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
-    
+
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    dbRef = FirebaseDatabase.instance.ref().child('history');
+    final listed = dbRef.orderByChild("userUID").equalTo(uid);
+
+    var data = [];
+    listed.onValue.listen((event) {
+      for (final child in event.snapshot.children) {
+        data.add(child.value);
+      }
+
+      if (data != null) {
+        setState(() {
+          _historyLength = data.length;
+        });
+      }
+
+    });
   }
+
+
   @override
   Widget build(BuildContext context) {
-    
-    return Column(
+    final mediaQuery = MediaQuery.of(context);
+
+    return Material(
+      child: Column(
       children: [
         Container(
           alignment: Alignment.centerLeft,
@@ -40,10 +58,42 @@ class _HistoryUIState extends State<HistoryUI> {
         ),
         Container(
           padding: EdgeInsets.only(bottom: 50),
-          child: History(),
-        )
+          child: 
+          // _historyLength == null ? 
+          //       Container(
+          //         color: Colors.white,
+          //         width: mediaQuery.size.width,
+          //         height: (mediaQuery.size.height - mediaQuery.padding.top),
+          //         child: Center(
+          //             child: Padding(
+          //                 padding: EdgeInsets.fromLTRB(150, 0, 150, 0),
+          //                 child: LoadingIndicator(
+          //                   indicatorType: Indicator.ballPulse,
+          //                   backgroundColor: Colors.white,
+          //                 ))),
+          //       )
+          //   :
+            _historyLength <= 0 ? 
+            Container(
+              child: Container(
+                  width: 500,
+                  padding: const EdgeInsets.fromLTRB(0, 25, 0, 20),
+                  margin: const EdgeInsets.fromLTRB(25, 30, 25, 15),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Color(0xFFCFCFCF)),
+                      borderRadius: BorderRadius.circular(15)),
+                  child: Column(children: [
+                    // Insert code for conditional rendering, if may history ang user or wala
+                    Text("You haven't simplified any text yet.",
+                        style: TextStyle(color: Colors.black))
+                  ]),
+                ),
+            )
+          : History()
+          )
       
       ],
+    ),
     );
   }
 }
