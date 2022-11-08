@@ -156,53 +156,44 @@ class _LoginScreenState extends State<LoginScreen> {
       padding: const EdgeInsets.fromLTRB(20, 15, 20, 20),
       minWidth: MediaQuery.of(context).size.width,
       onPressed: () async {
-        // signIn(emailController.text, passwordController.text);
         try {
-          // await _auth
-          //     .signInWithEmailAndPassword(email: email, password: password)
-          //     .then((uid) => {
-          //           Fluttertoast.showToast(msg: "Login Successful"),
-          //           // Navigator.of(context).pushReplacement(
-          //           MaterialPageRoute(builder: (context) => HomeScreen()),
-          //         });
-          // return null;
-          authService
+
+          await authService
               .signInWithEmailAndPassword(
                   emailController.text, passwordController.text)
               .then((value) => Fluttertoast.showToast(msg: "Login Successful"));
-        } on FirebaseAuthException catch (error) {
-          switch (error.code) {
-            case "invalid-email":
-              errorMessage = "Your email address appears to be malformed.";
-              break;
-            case "wrong-password":
-              errorMessage = "Your password is wrong.";
-              break;
-            case "user-not-found":
-              errorMessage = "User with this email doesn't exist.";
-              break;
-            case "user-disabled":
-              errorMessage = "User with this email has been disabled.";
-              break;
-            case "too-many-requests":
-              errorMessage = "Too many requests";
-              break;
-            case "operation-not-allowed":
-              errorMessage =
-                  "Signing in with Email and Password is not enabled.";
-              break;
-            default:
-              errorMessage = "An undefined Error happened.";
-          }
-          Fluttertoast.showToast(msg: errorMessage!);
-          print(error.code);
-        }
-
-        Navigator.of(context).push(
+          Navigator.of(context).push(
           await MaterialPageRoute(
             builder: (context) => MyHomePage(),
           ),
         );
+        } on FirebaseAuthException catch (error) {
+          switch (error.code) {
+            case "invalid-email":
+              errorMessage = "Whoops! Please check how your email is written";
+              break;
+            case "wrong-password":
+              errorMessage = "Sorry can't let you in, you entered the wrong password";
+              break;
+            case "user-not-found":
+              errorMessage = "We can't find you in our list, maybe try to sign up first.";
+              break;
+            case "user-disabled":
+              errorMessage = "Oh no! We think you got disabled, please sign up again instead.";
+              break;
+            case "too-many-requests":
+              errorMessage = "There's too much of you trying to log in, please try again after a while.";
+              break;
+            case "operation-not-allowed":
+              errorMessage =
+                  "We can't sign you in at the moment, please try again.";
+              break;
+            default:
+              errorMessage = "Oh no! Something wrong happened, please try again.";
+          }
+          Fluttertoast.showToast(msg: errorMessage!);
+          print(error.code);
+        }
       },
       child: Container(
           alignment: Alignment.center,

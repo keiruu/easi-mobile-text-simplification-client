@@ -14,6 +14,26 @@ class AuthService {
   var email;
   var currentUser;
 
+  reloadUser() async {
+    final User? user = _firebaseAuth.currentUser;
+    // final uid = user?.uid;
+    // print("UID");
+    // print(uid);
+
+    await user?.reload();
+    return user;
+  }
+
+  getCurrentUser() {
+    final User? user = _firebaseAuth.currentUser;
+    // final uid = user?.uid;
+    // print("UID");
+    // print(uid);
+
+    // await user?.reload();
+    return user;
+  }
+
   // Future<User?> getCurrentUser() async {
   //   await inUser?.reload();
   //   User? user = inUser;
@@ -93,15 +113,16 @@ class AuthService {
             await inUser?.updatePassword(pass);
           }
 
-          Fluttertoast.showToast(msg: "Successfully updated profile");
           await inUser?.reload();
           User? user = inUser;
           user = await _firebaseAuth.currentUser;
+          Fluttertoast.showToast(msg: "Successfully updated profile");
           //print final version to console
           print("Registered user:");
           print(user);
-        } catch (e) {
+        } on FirebaseAuthException catch (e) {
           Fluttertoast.showToast(msg: "Problem updating your profile");
+          Fluttertoast.showToast(msg: e.message.toString() );
         }
       } else {
         Fluttertoast.showToast(msg: "Oh no! Passwords don't match");
@@ -115,15 +136,14 @@ class AuthService {
           await inUser?.updateDisplayName(displayname);
         }
 
-        Fluttertoast.showToast(msg: "Successfully updated profile");
         await inUser?.reload();
         User? user = inUser;
         user = await _firebaseAuth.currentUser;
+        Fluttertoast.showToast(msg: "Successfully updated profile");
         //print final version to console
-        print("Registered user:");
-        print(user);
-      } catch (e) {
+      } on FirebaseAuthException catch (e) {
         Fluttertoast.showToast(msg: "Problem updating your profile");
+        Fluttertoast.showToast(msg: e.message.toString() );
       }
     }
   }

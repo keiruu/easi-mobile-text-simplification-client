@@ -1,12 +1,9 @@
 import 'package:easi/main.dart';
-
-import 'home.dart';
 import 'package:easi/screens/login_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'auth_service.dart';
 import 'package:provider/provider.dart';
-import 'package:loading_indicator/loading_indicator.dart';
 import 'model/user_model.dart';
 
 class Wrapper extends StatelessWidget {

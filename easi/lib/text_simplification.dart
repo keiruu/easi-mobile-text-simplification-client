@@ -1,14 +1,10 @@
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'auth_service.dart';
 import 'http_methods.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'main.dart';
-import 'package:easi/model/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TextSimplification extends StatefulWidget {
   @override
