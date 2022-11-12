@@ -108,16 +108,16 @@ class HistoryDetails extends StatelessWidget {
     // Use the Todo to create the UI.
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Image.asset(
-          'assets/logo.png',
-          height: 35,
-          width: 35,
-        ),
-        centerTitle: true,
-      ),
+      // appBar: AppBar(
+      //   backgroundColor: Colors.transparent,
+      //   elevation: 0,
+      //   title: Image.asset(
+      //     'assets/logo.png',
+      //     height: 35,
+      //     width: 35,
+      //   ),
+      //   centerTitle: true,
+      // ),
       body: SingleChildScrollView(
             child: Center(
               child: Padding(
@@ -141,7 +141,8 @@ class HistoryDetails extends StatelessWidget {
                   ),
                   FractionallySizedBox(
                     widthFactor: 1,
-                    child: Container(
+                    child: SingleChildScrollView(
+                      child: Container(
                         height: 200,
                         margin: const EdgeInsets.all(15.0),
                         padding: const EdgeInsets.all(10.0),
@@ -151,10 +152,14 @@ class HistoryDetails extends StatelessWidget {
                               width: 0.8,
                             ),
                             borderRadius: BorderRadius.circular(3)),
-                        child: Text(
-                          '${historyDetails["prompt"]}',
-                          style: TextStyle(fontSize: 16.0),
-                        )),
+                        child: SingleChildScrollView(
+                          child: Text(
+                            '${historyDetails["prompt"]}',
+                            style: TextStyle(fontSize: 16.0),
+                          )
+                        )
+                      )
+                    ) ,
                   ),
                   FractionallySizedBox(
                     widthFactor: 1,
@@ -168,10 +173,13 @@ class HistoryDetails extends StatelessWidget {
                               width: 0.8,
                             ),
                             borderRadius: BorderRadius.circular(3)),
-                        child: Text(
-                          '${historyDetails["result"]}',
-                          style: TextStyle(fontSize: 16.0),
-                        )),
+                        child: SingleChildScrollView(
+                          child: Text(
+                            '${historyDetails["result"]}',
+                            style: TextStyle(fontSize: 16.0),
+                          )
+                        )
+                      ),
                   ),
                   Container(
                     alignment: Alignment.centerLeft,

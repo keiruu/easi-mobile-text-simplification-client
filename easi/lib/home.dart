@@ -1,9 +1,11 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:easi/image_output_screen.dart';
+import 'package:easi/select_text_in_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:provider/provider.dart';
 import 'auth_service.dart';
+import 'history_home_ui.dart';
 import 'home_history.dart';
 import 'navigation.dart';
 import 'text_simplification.dart';
@@ -159,27 +161,82 @@ class _HomeState extends State<Home> {
       }
     }
 
-    // Sends extracted text for simplification
-    results = await postSimplifyText(scannedText);
     setState(() {
       _extractedText = scannedText;
       _scanningText = false;
     });
 
-    pushHistory(_extractedText, results, uid);
-    // print(_extractedText);
-
-    // Save cropped image
-    // saveImage();
-
-    // Goes to AR Overlay screen
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ImageScreen(_selectedFile, _extractedText,
-            recognizedText, _elements, _lines, results),
+        builder: (context) => ImageSelect(_selectedFile, _extractedText,
+            recognizedText, _elements, _lines),
       ),
     );
   }
+
+  // getResults(final inputImage, String? uid) async {
+  //   final textDetector = GoogleMlKit.vision.textRecognizer();
+  //   List<TextElement> _elements = [];
+  //   List<TextLine> _lines = [];
+  //   final results;
+
+  //   // Processes image
+  //   RecognizedText recognizedText = await textDetector.processImage(inputImage);
+  //   await textDetector.close();
+
+  //   String scannedText = "";
+
+  //   for (TextBlock block in recognizedText.blocks) {
+  //     for (TextLine line in block.lines) {
+  //       // Checks if the last character of the line is "-"
+  //       // ex. "Gusto ko maging hat-
+  //       // ex. dog ngayon."
+  //       // then it will join it with the next word instead of adding a space
+  //       String currentLine = "";
+  //       var checker = line.text.substring(line.text.length - 1);
+
+  //       if (checker == "-") {
+  //         currentLine = line.text.substring(0, line.text.length - 1);
+  //         scannedText = scannedText + currentLine;
+  //       } else {
+  //         currentLine = line.text;
+  //         scannedText = scannedText + currentLine + " ";
+  //       }
+
+  //       _lines.add(line);
+  //       for (TextElement element in line.elements) {
+  //         _elements.add(element);
+  //       }
+  //     }
+  //   }
+
+  //   // Sends extracted text for simplification
+  //   results = await postSimplifyText(scannedText);
+  //   setState(() {
+  //     _extractedText = scannedText;
+  //     _scanningText = false;
+  //   });
+
+  //   pushHistory(_extractedText, results, uid);
+  //   // print(_extractedText);
+
+  //   // Save cropped image
+  //   // saveImage();
+
+  //   // Goes to AR Overlay screen
+  //   // Navigator.of(context).push(
+  //   //   MaterialPageRoute(
+  //   //     builder: (context) => ImageScreen(_selectedFile, _extractedText,
+  //   //         recognizedText, _elements, _lines, results),
+  //   //   ),
+  //   // );
+  //   Navigator.of(context).push(
+  //     MaterialPageRoute(
+  //       builder: (context) => ImageScreen(_selectedFile, _extractedText, null,
+  //           recognizedText, _elements, _lines, results),
+  //     ),
+  //   );
+  // }
 
   // Code for loading image from camera or gallery and showing the crop tool
   getImage(ImageSource source, String? uid) async {
@@ -469,7 +526,7 @@ class _HomeState extends State<Home> {
                         ],
                       )
                       ),
-                      HomeHistory(),
+                      HomeHistoryUI(),
                       // Container(
                       //   width: 500,
                       //   padding: const EdgeInsets.fromLTRB(0, 25, 0, 20),

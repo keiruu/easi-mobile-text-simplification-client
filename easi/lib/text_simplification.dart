@@ -101,16 +101,16 @@ class _TextSimplificationState extends State<TextSimplification> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Image.asset(
-          'assets/logo.png',
-          height: 35,
-          width: 35,
-        ),
-        centerTitle: true,
-      ),
+      // appBar: AppBar(
+      //   backgroundColor: Colors.transparent,
+      //   elevation: 0,
+      //   title: Image.asset(
+      //     'assets/logo.png',
+      //     height: 35,
+      //     width: 35,
+      //   ),
+      //   centerTitle: true,
+      // ),
       body: loading
           ? const Center(
               child: Padding(
@@ -183,10 +183,13 @@ class _TextSimplificationState extends State<TextSimplification> {
                               width: 0.8,
                             ),
                             borderRadius: BorderRadius.circular(3)),
-                        child: Text(
-                          '$simplified',
-                          style: TextStyle(fontSize: 16.0),
-                        )),
+                        child: SingleChildScrollView(
+                          child: Text(
+                            '$simplified',
+                            style: TextStyle(fontSize: 16.0),
+                          )
+                        )
+                    ),
                   ),
                   Padding(
                       padding: EdgeInsets.all(15),

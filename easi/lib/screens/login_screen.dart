@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:easi/home.dart';
 import '../google_sign_in.dart';
 import 'package:easi/main.dart';
+import '../navigation.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -75,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
         enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Color(0xFFCFCFCF))),
         focusedBorder:
-            OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
+            OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF1976D2))),
       ),
     );
     //password
@@ -106,13 +107,13 @@ class _LoginScreenState extends State<LoginScreen> {
         enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Color(0xFFCFCFCF))),
         focusedBorder:
-            OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
+            OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF1976D2))),
       ),
     );
 
     Widget _buildForgotPasswordBtn() {
       return Container(
-        alignment: Alignment.centerRight,
+        alignment: Alignment.topRight,
         child: FlatButton(
           onPressed: () => print('Forgot Password Button Pressed'),
           child: Container(
@@ -157,39 +158,43 @@ class _LoginScreenState extends State<LoginScreen> {
       minWidth: MediaQuery.of(context).size.width,
       onPressed: () async {
         try {
-
           await authService
               .signInWithEmailAndPassword(
                   emailController.text, passwordController.text)
               .then((value) => Fluttertoast.showToast(msg: "Login Successful"));
           Navigator.of(context).push(
-          await MaterialPageRoute(
-            builder: (context) => MyHomePage(),
-          ),
-        );
+            await MaterialPageRoute(
+              builder: (context) => Navigation(selectedIndex: 0),
+            ),
+          );
         } on FirebaseAuthException catch (error) {
           switch (error.code) {
             case "invalid-email":
               errorMessage = "Whoops! Please check how your email is written";
               break;
             case "wrong-password":
-              errorMessage = "Sorry can't let you in, you entered the wrong password";
+              errorMessage =
+                  "Sorry can't let you in, you entered the wrong password";
               break;
             case "user-not-found":
-              errorMessage = "We can't find you in our list, maybe try to sign up first.";
+              errorMessage =
+                  "Seems like you're new here. Maybe try to sign up first.";
               break;
             case "user-disabled":
-              errorMessage = "Oh no! We think you got disabled, please sign up again instead.";
+              errorMessage =
+                  "Oh no! We think you got disabled, please sign up again instead.";
               break;
             case "too-many-requests":
-              errorMessage = "There's too much of you trying to log in, please try again after a while.";
+              errorMessage =
+                  "There's too much of you trying to log in, please try again after a while.";
               break;
             case "operation-not-allowed":
               errorMessage =
                   "We can't sign you in at the moment, please try again.";
               break;
             default:
-              errorMessage = "Oh no! Something wrong happened, please try again.";
+              errorMessage =
+                  "Oh no! Something wrong happened, please try again.";
           }
           Fluttertoast.showToast(msg: errorMessage!);
           print(error.code);
@@ -208,14 +213,15 @@ class _LoginScreenState extends State<LoginScreen> {
     final loginButton = Material(
       elevation: 0,
       borderRadius: BorderRadius.circular(5),
-      color: Color(0xFF5274AE),
+      color: Color(0xFF1976D2),
       child: materialButton,
     );
 
     final googlelog = Material(
         elevation: 5,
         borderRadius: BorderRadius.circular(5),
-        color: Colors.white);
+        color: Colors.white,
+        child:
     MaterialButton(
       padding: EdgeInsets.fromLTRB(20, 15, 20, 20),
       minWidth: MediaQuery.of(context).size.width,
@@ -227,26 +233,11 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Text(
             'Sign in with Google',
             style: TextStyle(
-              color: (Colors.white),
+              color: (Color.fromARGB(255, 45, 196, 70)),
             ),
           )),
-    );
+    ));
 
-// will remove later
-    /*ElevatedButton.icon(
-    style:ElevatedButton.styleFrom(
-      primary: Colors.blue,
-      onPrimary: Colors.black,
-      minimumSize: Size(double.infinity, 50),
-    ),
-    icon: FaIcon(FontAwesomeIcons.google),
-    label: Text('Sign in With Google'),
-    onPressed: () {
-      final provider = Provider.of(context, listen: false);
-      provider.googleLogin();
-    },
-
-  );*/
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
@@ -266,25 +257,26 @@ class _LoginScreenState extends State<LoginScreen> {
                                 padding:
                                     const EdgeInsets.fromLTRB(30, 30, 30, 50),
                                 child: const Text(
-                                  'Hello again!',
+                                  'Welcome!',
                                   style: TextStyle(
                                       color: Color(0xFF1976D2),
                                       fontWeight: FontWeight.w900,
                                       fontSize: 30),
                                 )),
                             emailField,
-                            SizedBox(height: 45),
+                            SizedBox(height: 40),
                             passwordField,
-                            SizedBox(height: 30),
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                _buildRememberMeCheckbox(),
+                                // _buildRememberMeCheckbox(),
                                 _buildForgotPasswordBtn(),
                               ],
                             ),
+                            SizedBox(height: 20),
                             loginButton,
                             SizedBox(height: 10),
-                            googlelog,
+                            // googlelog,
                             SizedBox(height: 10),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,

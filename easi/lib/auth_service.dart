@@ -14,6 +14,13 @@ class AuthService {
   var email;
   var currentUser;
 
+  bool loading = false;
+  setLoading(bool state) {
+    loading = state;
+    // print(loading);
+    return loading;
+  }
+
   reloadUser() async {
     final User? user = _firebaseAuth.currentUser;
     // final uid = user?.uid;
@@ -122,7 +129,7 @@ class AuthService {
           print(user);
         } on FirebaseAuthException catch (e) {
           Fluttertoast.showToast(msg: "Problem updating your profile");
-          Fluttertoast.showToast(msg: e.message.toString() );
+          Fluttertoast.showToast(msg: e.message.toString());
         }
       } else {
         Fluttertoast.showToast(msg: "Oh no! Passwords don't match");
@@ -143,7 +150,7 @@ class AuthService {
         //print final version to console
       } on FirebaseAuthException catch (e) {
         Fluttertoast.showToast(msg: "Problem updating your profile");
-        Fluttertoast.showToast(msg: e.message.toString() );
+        Fluttertoast.showToast(msg: e.message.toString());
       }
     }
   }

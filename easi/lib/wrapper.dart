@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'auth_service.dart';
 import 'package:provider/provider.dart';
 import 'model/user_model.dart';
+import 'navigation.dart';
 
 class Wrapper extends StatelessWidget {
   @override
@@ -32,7 +33,8 @@ class Wrapper extends StatelessWidget {
           //   );
           // }
           final UserModel? user = snapshot.data; // does user have data
-          return user == null ? LoginScreen() : MyHomePage();
+          print(user);
+          return user == null ? LoginScreen() : Navigation(selectedIndex: 0);
         });
   }
 }

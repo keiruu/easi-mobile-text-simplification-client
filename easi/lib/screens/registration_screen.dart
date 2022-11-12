@@ -66,7 +66,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Color(0xFFCFCFCF))),
         focusedBorder:
-            OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
+            OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF1976D2))),
       ),
     );
     //email Field
@@ -98,7 +98,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Color(0xFFCFCFCF))),
         focusedBorder:
-            OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
+            OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF1976D2))),
         // border: OutlineInputBorder(
         //   borderRadius: BorderRadius.circular(5),
         //   borderSide: BorderSide(width: 3, color: Colors.greenAccent), //<-- SEE HERE
@@ -136,14 +136,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Color(0xFFCFCFCF))),
         focusedBorder:
-            OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
+            OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF1976D2))),
       ),
     );
 
     final signupButton = Material(
       elevation: 0,
       borderRadius: BorderRadius.circular(5),
-      color: Color(0xFF5274AE),
+      color: Color(0xFF1976D2),
       child: MaterialButton(
         padding: EdgeInsets.fromLTRB(20, 15, 20, 20),
         minWidth: MediaQuery.of(context).size.width,
@@ -196,7 +196,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             child: Container(
                 color: Colors.white,
                 child: Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.fromLTRB(35, 20, 35, 20),
                   child: Form(
                       key: _formKey,
                       child: Column(
@@ -205,13 +205,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           children: <Widget>[
                             Container(
                                 alignment: Alignment.center,
-                                padding: const EdgeInsets.all(50),
+                                padding: const EdgeInsets.only(bottom: 40),
                                 child: const Text(
-                                  'Welcome!',
+                                  'Create an Account',
                                   style: TextStyle(
-                                      color: Color(0xFF5274AE),
+                                      color: Color(0xFF1976D2),
                                       fontWeight: FontWeight.w900,
-                                      fontSize: 30),
+                                      fontSize: 27),
                                 )),
                             fullNameField,
                             SizedBox(height: 30),

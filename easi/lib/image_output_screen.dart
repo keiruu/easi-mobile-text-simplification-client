@@ -4,7 +4,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:loading_indicator/loading_indicator.dart';
+import 'package:provider/provider.dart';
+import 'auth_service.dart';
 import 'http_methods.dart';
+import 'main.dart';
 
 class ImageScreen extends StatefulWidget {
   final selectedFile;
@@ -13,9 +16,10 @@ class ImageScreen extends StatefulWidget {
   final elements;
   final lines;
   final results;
+  final extracted;
 
   const ImageScreen(this.selectedFile, this.extractedText, this.recognizedText,
-      this.elements, this.lines, this.results,
+      this.extracted, this.elements, this.lines, this.results,
       {Key? key})
       : super(key: key);
 
@@ -82,26 +86,35 @@ class _ImageScreenState extends State<ImageScreen> {
     super.initState();
   }
 
-  Widget getImageWidget() {
-    if (widget.selectedFile != null) {
-      return Image.file(
-        widget.selectedFile,
-        width: 250,
-        height: 250,
-        fit: BoxFit.cover,
-      );
-    } else {
-      return Text("Wala image");
-    }
-  }
-
   // widget._selectedFile
   @override
   Widget build(BuildContext context) {
-    return !loading
+    final authService = Provider.of<AuthService>(context);
+    return !authService.loading
         ? _imageSize != null
             ? Stack(
                 children: <Widget>[
+                  Container(
+                      alignment: Alignment.topRight,
+                      margin: EdgeInsets.fromLTRB(0, 60, 0, 40),
+                      child: MaterialButton(
+                        color: Colors.blue,
+                        shape: const CircleBorder(),
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => MyHomePage(),
+                            ),
+                          );
+                        },
+                        child: const Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Icon(
+                              Icons.check,
+                              color: Colors.white,
+                              size: 30,
+                            )),
+                      )),
                   Center(
                     child: Container(
                       width: double.maxFinite,
@@ -143,14 +156,14 @@ class _ImageScreenState extends State<ImageScreen> {
                                 ),
                               ),
                             ),
-                            Container(
-                              height: 100,
-                              child: SingleChildScrollView(
-                                child: Text(
-                                  "Extracted text: ${widget.extractedText}",
-                                ),
-                              ),
-                            ),
+                            // Container(
+                            //   height: 100,
+                            //   child: SingleChildScrollView(
+                            //     child: Text(
+                            //       "Extracted text: ${widget.recognizedText}",
+                            //     ),
+                            //   ),
+                            // ),
                           ],
                         ),
                       ),
@@ -235,8 +248,8 @@ class TextDetectorPainter extends CustomPainter {
       final List lineSplit = line.text.split(' ');
       String result = "";
       int len = lineSplit.length;
-      print("Line split length $len");
-      for (var x = 0; x <= lineSplit.length; x++) {
+      // print("Line split length $len");
+      for (var x = 0; x < lineSplit.length; x++) {
         // Stitches together the line based on the number of words sa original text
         // minus 2 kay for some reason sobra ang length sang results by 2
         if (num <= words.length && endLength <= words.length - 2) {
@@ -244,8 +257,8 @@ class TextDetectorPainter extends CustomPainter {
           num++;
           // Set end number
           endLength = num - 1;
-          print("End length $endLength");
-          print(result);
+          // print("End length $endLength");
+          // print(result);
         }
       }
 
@@ -254,9 +267,6 @@ class TextDetectorPainter extends CustomPainter {
           scaleRect(line).top);
 
       num = endLength + 1;
-      print("Num $num");
-
- 
     }
   }
 

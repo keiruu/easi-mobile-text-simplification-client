@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'historyUI.dart';
+import 'history_ui.dart';
 import 'home.dart';
 import 'profile.dart';
 import 'auth_service.dart';
