@@ -1,4 +1,4 @@
-import 'package:easi/historyUI.dart';
+import 'package:easi/history_ui.dart';
 import 'package:easi/navigation.dart';
 import 'package:easi/screens/registration_screen.dart';
 import 'package:easi/wrapper.dart';
@@ -44,25 +44,27 @@ class MyApp extends StatelessWidget {
               fontFamily: 'Inter',
               scaffoldBackgroundColor: Color(0xFFF6F6F8)),
           home: SplashScreen(
+            useLoader: true,
             seconds: 4,
-            navigateAfterSeconds: Navigation(selectedIndex: 0),
+            navigateAfterSeconds: MyHomePage(),
+            photoSize: 40,
             image: Image.asset(
               'assets/logo.png',
-              height: 50,
-              width: 50,
+              height: 200,
+              width: 200,
             ),
             backgroundColor: Colors.white,
           ),
-          initialRoute: '/',
-          routes: {
-            '/': (context) => Wrapper(),
-            '/login': (context) => LoginScreen(),
-            '/register': (context) => RegistrationScreen(),
-            '/profile': (context) => Profile(
-                  userKey: '',
-                ),
-            '/history': (context) => HistoryUI(),
-          },
+          // initialRoute: '/',
+          // routes: {
+          //   '/': (context) => Wrapper(),
+          //   '/login': (context) => LoginScreen(),
+          //   '/register': (context) => RegistrationScreen(),
+          //   '/profile': (context) => Profile(
+          //         userKey: '',
+          //       ),
+          //   '/history': (context) => HistoryUI(),
+          // },
         ),
       )
     );
@@ -91,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
           visible: Provider.of<InternetConnectionStatus>(context) ==
               InternetConnectionStatus.disconnected,
           child: const InternetNotAvailable(),
-        ) : Navigation(selectedIndex: 0)
+        ) : Wrapper()
       ],
     );
   }
