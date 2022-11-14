@@ -67,6 +67,7 @@ dependencies:
   flutter_launcher_icons: ^0.10.0
   splashscreen: ^1.3.5
   touchable: ^1.0.2
+  kt_dart: ^1.0.0
  
 dev_dependencies:
   flutter_test:

@@ -3,6 +3,8 @@ import 'dart:io';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:kt_dart/collection.dart';
+import 'package:kt_dart/kt.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'auth_service.dart';
@@ -203,6 +205,7 @@ class TextDetectorPainter extends CustomPainter {
     final double scaleX = size.width / absoluteImageSize.width;
     final double scaleY = size.height / absoluteImageSize.height;
     final List<TextLine> newLines;
+    List excess = [];
 
     Rect scaleRect(container) {
       return Rect.fromLTRB(
@@ -237,18 +240,23 @@ class TextDetectorPainter extends CustomPainter {
     }
 
     // Now split that string and get the words.
+    // A list of words in results
     final List words = wordsToBeSplit.split(' ');
+    print(words);
     int len2 = words.length;
     print('Words $len2');
     int num = 0;
     int endLength = 0;
+    String finalText = "";
 
+    // for each line in the picture
     for (TextLine line in lines) {
       // lineSplit.length = pila ka words ara sa isa ka line.
       final List lineSplit = line.text.split(' ');
       String result = "";
-      int len = lineSplit.length;
       // print("Line split length $len");
+
+      // for each word in the line
       for (var x = 0; x < lineSplit.length; x++) {
         // Stitches together the line based on the number of words sa original text
         // minus 2 kay for some reason sobra ang length sang results by 2
@@ -263,11 +271,20 @@ class TextDetectorPainter extends CustomPainter {
       }
 
       // Display each line
-      drawName(canvas, result, scaleRect(line).height + 2, scaleRect(line).left,
+      drawName(canvas, result, scaleRect(line).height, scaleRect(line).left,
           scaleRect(line).top);
 
       num = endLength + 1;
+      finalText = result;
     }
+
+    // if (endLength < words.length) {
+    //   // excess.add(finalText.substring(words.length, endLength));
+    //   print("yup");
+    //   print(words.length);
+    //   print("yup");
+    //   print(endLength);
+    // }
   }
 
   // Displays all the words processed as an AR Overlay
@@ -275,7 +292,7 @@ class TextDetectorPainter extends CustomPainter {
     TextSpan span = TextSpan(
         style: TextStyle(
           color: Colors.black,
-          fontSize: size - 3,
+          fontSize: size - 4,
         ),
         text: text);
     TextPainter tp = TextPainter(

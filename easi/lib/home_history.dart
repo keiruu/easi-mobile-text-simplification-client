@@ -50,8 +50,9 @@ class _HomeHistoryState extends State<HomeHistory> {
       _history.forEach((index) {
         if (index["result"].length > 60) {
           index["placeholder"] = index["result"].substring(0, 60) + "...";
+        } else {
+          index["placeholder"] = index["result"];
         }
-
       });
     });
   }
