@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easi/main.dart';
 import 'package:easi/screens/login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'model/user_model.dart';
+import 'navigation.dart';
 
 class AuthService {
   final auth.FirebaseAuth _firebaseAuth = auth.FirebaseAuth.instance;
@@ -103,30 +105,39 @@ class AuthService {
     );
   }
 
-  Future<void> updateProfile(
-      String displayname, String email, String pass, String conpass) async {
+  Future<void> sendPasswordResetEmail(String email) async {
+    await _firebaseAuth.sendPasswordResetEmail(email: email);
+  }
+
+  Future<void> updateProfile(String displayname, String email, String pass, String conpass, BuildContext context) async {
     Fluttertoast.showToast(msg: "Updating your profile");
 
     if (pass != "" || conpass != "") {
       if (pass == conpass) {
         try {
+          User? user;
+          user = _firebaseAuth.currentUser;
           if (email != "") {
-            await inUser?.updateEmail(email);
+            await user?.updateEmail(email);
           }
           if (displayname != "") {
-            await inUser?.updateDisplayName(displayname);
+            await user?.updateDisplayName(displayname);
           }
           if (pass != "") {
-            await inUser?.updatePassword(pass);
+            await user?.updatePassword(pass);
           }
 
           await inUser?.reload();
-          User? user = inUser;
-          user = await _firebaseAuth.currentUser;
           Fluttertoast.showToast(msg: "Successfully updated profile");
           //print final version to console
           print("Registered user:");
           print(user);
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (context) => Navigation(selectedIndex: 1),
+          //   ),
+          // );
         } on FirebaseAuthException catch (e) {
           Fluttertoast.showToast(msg: "Problem updating your profile");
           Fluttertoast.showToast(msg: e.message.toString());

@@ -2,6 +2,7 @@ import 'package:easi/main.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 import 'auth_service.dart';
@@ -159,7 +160,7 @@ class _ProfileState extends State<Profile> {
                 userNameController.text,
                 userEmailController.text,
                 userPasswordController.text,
-                userConfirmpasswordController.text);
+                userConfirmpasswordController.text, context);
 
             // User? user = authService.getCurrentUser();
             // print("CRUREURE");

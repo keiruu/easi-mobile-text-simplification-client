@@ -2,6 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/auth_service.dart';
+import 'package:easi/screens/forgot_password.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -115,7 +116,14 @@ class _LoginScreenState extends State<LoginScreen> {
       return Container(
         alignment: Alignment.topRight,
         child: FlatButton(
-          onPressed: () => print('Forgot Password Button Pressed'),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ForgotPassword(),
+              ),
+            );
+          },
           child: Container(
               child: const Text(
             'Forgot Password?',

@@ -127,7 +127,7 @@ class _TextSimplificationState extends State<TextSimplification> {
                     )))
             : SingleChildScrollView(
                 child: Center(
-                    child: Padding(
+                  child: Padding(
                   padding: EdgeInsets.fromLTRB(15, 50, 15, 0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,

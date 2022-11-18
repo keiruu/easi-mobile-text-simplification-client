@@ -3,8 +3,6 @@ import 'dart:io';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
-import 'package:kt_dart/collection.dart';
-import 'package:kt_dart/kt.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'auth_service.dart';
@@ -292,7 +290,7 @@ class TextDetectorPainter extends CustomPainter {
     TextSpan span = TextSpan(
         style: TextStyle(
           color: Colors.black,
-          fontSize: size - 4,
+          fontSize: size ,
         ),
         text: text);
     TextPainter tp = TextPainter(
